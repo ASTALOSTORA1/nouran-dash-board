@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouran Sameh</title>
+    <title>معرض الصور الشخصي - Nouran Sameh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
@@ -613,7 +613,7 @@
         <div class="login-container">
             <div class="login-header">
                 <h1><i class="fas fa-images"></i> معرض نوران</h1>
-                <p>لوحة التحكم للباشمترجمة نوران ☝</p>
+                <p>نظام إدارة المعرض الشخصي</p>
             </div>
             
             <form id="loginForm">
@@ -687,9 +687,9 @@
                 </div>
                 
                 <div class="card">
-                    <div class="alert alert-info">
+                    <div id="localModeNotification" class="alert alert-info hidden">
                         <i class="fas fa-info-circle"></i> 
-                        اسحب وأفلت الصورة أو انقر لاختيارها من جهازك (الحد الأقصى 5MB)
+                        <span>الوضع المحلي: يتم العمل بدون اتصال بالخادم. سيتم حفظ الصور محلياً فقط.</span>
                     </div>
                     
                     <form id="projectForm">
@@ -797,6 +797,7 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const loggedInUser = document.getElementById('loggedInUser');
         const loginTime = document.getElementById('loginTime');
+        const localModeNotification = document.getElementById('localModeNotification');
         
         // عناصر التنقل
         const menuAdd = document.getElementById('menuAdd');
@@ -907,7 +908,7 @@
                 fileSize.textContent = ` (${formatFileSize(file.size)})`;
                 
                 uploadStatus.textContent = '✅ الصورة جاهزة للرفع';
-                uploadStatus.className = 'upload-status success';
+                uploadStatus.style.color = 'green';
             };
             reader.readAsDataURL(file);
         }
@@ -920,7 +921,7 @@
             uploadProgress.classList.add('active');
             uploadProgressBar.style.width = '10%';
             uploadStatus.textContent = 'جاري رفع الصورة...';
-            uploadStatus.className = 'upload-status';
+            uploadStatus.style.color = 'var(--primary)';
             state.isUploading = true;
             
             try {
@@ -930,6 +931,30 @@
                         uploadProgressBar.style.width = (currentWidth + 10) + '%';
                     }
                 }, 300);
+                
+                // التحقق من التوكن قبل الإرسال
+                if (!state.token || state.token === 'local-auth-token') {
+                    // في الوضع المحلي، استخدم URL محلي للصورة
+                    clearInterval(progressInterval);
+                    uploadProgressBar.style.width = '100%';
+                    
+                    // محاكاة رفع الصورة محلياً
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    uploadStatus.textContent = '✅ تم حفظ الصورة محلياً';
+                    uploadStatus.style.color = 'green';
+                    
+                    setTimeout(() => {
+                        uploadProgress.classList.remove('active');
+                        uploadProgressBar.style.width = '0%';
+                    }, 1500);
+                    
+                    return {
+                        url: URL.createObjectURL(file),
+                        filename: file.name,
+                        local: true
+                    };
+                }
                 
                 const response = await fetch(`${API_BASE_URL}/upload`, {
                     method: 'POST',
@@ -942,8 +967,28 @@
                 clearInterval(progressInterval);
                 uploadProgressBar.style.width = '100%';
                 
+                // إذا كان التوكن غير صالح أو منتهي
+                if (response.status === 401) {
+                    // أزل التوكن من localStorage وأعد التوجيه للدخول
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('loginTime');
+                    state.token = null;
+                    state.currentUser = null;
+                    
+                    SweetAlert.fire({
+                        title: 'انتهت الجلسة',
+                        text: 'انتهت صلاحية جلسة العمل. يرجى تسجيل الدخول مرة أخرى.',
+                        icon: 'warning',
+                        confirmButtonText: 'تسجيل الدخول'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    
+                    throw new Error('انتهت صلاحية التوكن. يرجى تسجيل الدخول مرة أخرى.');
+                }
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.error || `خطأ في الخادم: ${response.status}`);
                 }
                 
@@ -954,7 +999,7 @@
                 }
                 
                 uploadStatus.textContent = '✅ تم رفع الصورة بنجاح';
-                uploadStatus.className = 'upload-status success';
+                uploadStatus.style.color = 'green';
                 
                 setTimeout(() => {
                     uploadProgress.classList.remove('active');
@@ -964,7 +1009,8 @@
                 return data.data;
             } catch (error) {
                 uploadStatus.textContent = '❌ فشل في رفع الصورة';
-                uploadStatus.className = 'upload-status error';
+                uploadStatus.style.color = 'var(--danger)';
+                console.error('خطأ في الرفع:', error);
                 throw error;
             } finally {
                 state.isUploading = false;
@@ -972,25 +1018,67 @@
         }
 
         async function createProject(projectData) {
-            const response = await fetch(`${API_BASE_URL}/projects`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${state.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(projectData)
-            });
-            
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'فشل في حفظ الصورة');
+            // إذا كان التوكن محلياً، احفظ المشروع محلياً
+            if (!state.token || state.token === 'local-auth-token') {
+                const newProject = {
+                    _id: 'local-' + Date.now(),
+                    title: projectData.title,
+                    description: projectData.description,
+                    imageUrl: projectData.imageUrl,
+                    uploadedAt: new Date().toISOString(),
+                    local: true
+                };
+                
+                state.projects.push(newProject);
+                localStorage.setItem('local_projects', JSON.stringify(state.projects));
+                return newProject;
             }
             
-            return data.data;
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(projectData)
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'فشل في حفظ الصورة');
+                }
+                
+                return data.data;
+            } catch (error) {
+                console.error('خطأ في حفظ المشروع:', error);
+                throw error;
+            }
         }
 
         async function fetchProjects() {
+            // حاول جلب المشاريع المحلية أولاً
+            const localProjects = localStorage.getItem('local_projects');
+            if (localProjects) {
+                try {
+                    const parsedProjects = JSON.parse(localProjects);
+                    if (Array.isArray(parsedProjects)) {
+                        state.projects = parsedProjects;
+                        renderProjects();
+                        updateStats();
+                    }
+                } catch (e) {
+                    console.error('خطأ في تحليل المشاريع المحلية:', e);
+                }
+            }
+            
+            // إذا كان التوكن محلياً، لا تحاول الاتصال بالخادم
+            if (!state.token || state.token === 'local-auth-token') {
+                return;
+            }
+            
+            // حاول جلب المشاريع من الخادم
             try {
                 const response = await fetch(`${API_BASE_URL}/projects`, {
                     method: 'GET',
@@ -1010,45 +1098,73 @@
                     throw new Error(data.error);
                 }
             } catch (error) {
-                console.error('خطأ في جلب الصور:', error);
-                // يمكن تجاهل الخطأ في العرض الأولي
+                console.error('خطأ في جلب الصور من الخادم:', error);
+                // استمر في استخدام المشاريع المحلية
             }
         }
 
         async function deleteProject(projectId) {
-            const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${state.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error);
+            // إذا كان المشروع محلياً
+            if (projectId.startsWith('local-')) {
+                state.projects = state.projects.filter(p => p._id !== projectId);
+                localStorage.setItem('local_projects', JSON.stringify(state.projects));
+                return true;
             }
             
-            return true;
+            // إذا كان المشروع على الخادم
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('خطأ في حذف المشروع:', error);
+                throw error;
+            }
         }
 
         async function deleteAllProjects() {
-            const response = await fetch(`${API_BASE_URL}/projects`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${state.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            // حذف المشاريع المحلية
+            state.projects = state.projects.filter(p => p.local !== true);
+            localStorage.setItem('local_projects', JSON.stringify(state.projects.filter(p => p.local === true)));
             
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error);
+            // إذا كان التوكن محلياً، لا تحاول حذف من الخادم
+            if (!state.token || state.token === 'local-auth-token') {
+                return true;
             }
             
-            return true;
+            // حذف المشاريع من الخادم
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('خطأ في حذف جميع المشاريع:', error);
+                throw error;
+            }
         }
 
         async function login(username, password) {
@@ -1067,8 +1183,16 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username: normalizedDefaultUsername, password })
+                    body: JSON.stringify({ 
+                        username: normalizedDefaultUsername, 
+                        password 
+                    })
                 });
+                
+                // إذا فشل الاتصال أو كان الخادم غير متوفر
+                if (!response.ok) {
+                    throw new Error('الخادم غير متوفر حالياً');
+                }
                 
                 const data = await response.json();
                 
@@ -1078,18 +1202,42 @@
                     state.loginTime = new Date();
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('loginTime', state.loginTime.toISOString());
+                    
+                    // أخف إشعار الوضع المحلي
+                    if (localModeNotification) {
+                        localModeNotification.classList.add('hidden');
+                    }
+                    
                     return true;
                 } else {
                     throw new Error(data.error || 'فشل في تسجيل الدخول');
                 }
             } catch (error) {
-                // إذا فشل الاتصال بالخادم، استخدم مصادقة محلية
                 console.warn('استخدام مصادقة محلية:', error.message);
+                // استخدم المصادقة المحلية
                 state.token = 'local-auth-token';
-                state.currentUser = { username: 'nouran sameh', id: 'local-user' };
+                state.currentUser = { 
+                    username: 'نوران سامح', 
+                    id: 'local-user' 
+                };
                 state.loginTime = new Date();
                 localStorage.setItem('token', 'local-auth-token');
                 localStorage.setItem('loginTime', state.loginTime.toISOString());
+                
+                SweetAlert.fire({
+                    title: '⚠️ وضع غير متصل',
+                    html: `
+                        <div style="text-align: center;">
+                            <p>الخادم غير متوفر حالياً</p>
+                            <p style="color: var(--gray); font-size: 0.9rem; margin-top: 10px;">
+                                يتم استخدام الوضع المحلي. يمكنك إضافة الصور محلياً.
+                            </p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    timer: 3000
+                });
+                
                 return true;
             }
         }
@@ -1115,13 +1263,15 @@
             state.projects.forEach(project => {
                 const uploadDate = new Date(project.uploadedAt);
                 const dateStr = formatDate(uploadDate);
+                const localBadge = project.local ? '<span style="background: #f72585; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-right: 5px;">محلي</span>' : '';
                 
                 html += `
                     <div class="project-card">
                         <div style="position: relative; overflow: hidden;">
                             <img src="${project.imageUrl}" alt="${project.title}" class="project-image">
-                            <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem;">
-                                <i class="fas fa-calendar"></i> ${dateStr}
+                            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; display: flex; align-items: center;">
+                                ${localBadge}
+                                <i class="fas fa-calendar" style="margin-right: 5px;"></i> ${dateStr}
                             </div>
                         </div>
                         <div class="project-info">
@@ -1152,6 +1302,7 @@
                                 <i class="fas fa-trash-alt" style="font-size: 3rem; color: #f72585; margin-bottom: 1rem;"></i>
                                 <p>هل أنت متأكد من حذف الصورة؟</p>
                                 <p style="color: var(--secondary); font-weight: bold;">${project?.title}</p>
+                                ${project?.local ? '<p style="color: #f72585; font-size: 0.9rem;">(صورة محلية)</p>' : ''}
                             </div>
                         `,
                         icon: 'warning',
@@ -1252,6 +1403,7 @@
                             <i class="fas fa-check-circle" style="font-size: 4rem; color: #4cc9f0; margin-bottom: 1rem;"></i>
                             <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">تم إضافة الصورة إلى المعرض</p>
                             <p style="color: var(--gray);">${title}</p>
+                            ${state.token === 'local-auth-token' ? '<p style="color: #f72585; margin-top: 10px;">(تم الحفظ محلياً)</p>' : ''}
                         </div>
                     `,
                     icon: 'success',
@@ -1302,6 +1454,15 @@
                 loginTime.textContent = `سجلت دخولك الساعة ${formatTime(state.loginTime)}`;
             }
             
+            // أظهر أو أخف إشعار الوضع المحلي
+            if (localModeNotification) {
+                if (state.token === 'local-auth-token') {
+                    localModeNotification.classList.remove('hidden');
+                } else {
+                    localModeNotification.classList.add('hidden');
+                }
+            }
+            
             fetchProjects();
             switchPage('addPage');
         }
@@ -1347,8 +1508,8 @@
                 showDashboard();
                 loginError.classList.add('hidden');
                 
- SweetAlert.fire({
-                    title: 'أهلا بالباشمترجمة نوران',
+                SweetAlert.fire({
+                    title: 'أهلاً بك',
                     text: 'تم تسجيل الدخول بنجاح',
                     icon: 'success',
                     timer: 2000,
@@ -1419,17 +1580,34 @@
                 return;
             }
             
+            const localProjects = state.projects.filter(p => p.local === true);
+            const serverProjects = state.projects.filter(p => p.local !== true);
+            
+            let alertText = '';
+            if (localProjects.length > 0 && serverProjects.length > 0) {
+                alertText = `
+                    <div style="background: rgba(247, 37, 133, 0.1); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                        <p style="color: #f72585; font-weight: bold; margin-bottom: 0.5rem;">⚠️ سيتم حذف الصور من:</p>
+                        <p style="color: var(--gray);">• الخادم: <strong>${serverProjects.length}</strong> صورة</p>
+                        <p style="color: var(--gray);">• التخزين المحلي: <strong>${localProjects.length}</strong> صورة</p>
+                    </div>
+                `;
+            } else if (localProjects.length > 0) {
+                alertText = `
+                    <div style="background: rgba(247, 37, 133, 0.1); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                        <p style="color: #f72585; font-weight: bold; margin-bottom: 0.5rem;">⚠️ سيتم حذف الصور المحلية فقط</p>
+                    </div>
+                `;
+            }
+            
             SweetAlert.fire({
                 title: 'مسح جميع الصور',
                 html: `
                     <div style="text-align: center;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #f72585; margin-bottom: 1rem;"></i>
                         <p style="font-size: 1.2rem; margin-bottom: 1rem;">هل أنت متأكد من مسح <strong>جميع الصور</strong>؟</p>
-                        <div style="background: rgba(247, 37, 133, 0.1); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
-                            <p style="color: #f72585; font-weight: bold; margin-bottom: 0.5rem;">⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!</p>
-                            <p style="color: var(--gray);">عدد الصور المراد حذفها: <strong>${state.projects.length}</strong> صورة</p>
-                        </div>
-                        <p style="color: var(--gray); font-size: 0.9rem;">سيتم حذف جميع الصور من المعرض والمخزن</p>
+                        ${alertText}
+                        <p style="color: var(--gray); font-size: 0.9rem;">هذا الإجراء لا يمكن التراجع عنه!</p>
                     </div>
                 `,
                 icon: 'error',
@@ -1505,7 +1683,14 @@
                 state.token = token;
                 state.loginTime = loginTime;
                 
-                // محاولة التحقق من الخادم
+                // إذا كان التوكن محلياً، استخدم الوضع المحلي
+                if (token === 'local-auth-token') {
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
+                    showDashboard();
+                    return;
+                }
+                
+                // حاول التحقق من التوكن مع الخادم
                 try {
                     const response = await fetch(`${API_BASE_URL}/auth/me`, {
                         method: 'GET',
@@ -1523,12 +1708,22 @@
                             return;
                         }
                     }
-                } catch (error) {
-                    console.log('استخدام مصادقة محلية:', error.message);
-                    state.currentUser = { username: 'nouran sameh', id: 'local-user' };
+                    
+                    // إذا فشل التحقق، انتقل للوضع المحلي
+                    console.log('فشل التحقق من التوكن، استخدام الوضع المحلي');
+                    state.token = 'local-auth-token';
+                    localStorage.setItem('token', 'local-auth-token');
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
                     showDashboard();
-                    return;
+                    
+                } catch (error) {
+                    console.log('فشل الاتصال بالخادم، استخدام الوضع المحلي:', error.message);
+                    state.token = 'local-auth-token';
+                    localStorage.setItem('token', 'local-auth-token');
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
+                    showDashboard();
                 }
+                return;
             }
             
             showLogin();
@@ -1536,25 +1731,8 @@
 
         // ============== بدء التطبيق ==============
         document.addEventListener('DOMContentLoaded', function() {
-            // إضافة تأثير اهتزاز
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                    20%, 40%, 60%, 80% { transform: translateX(5px); }
-                }
-            `;
-            document.head.appendChild(style);
-            
             checkAuth();
         });
     </script>
 </body>
-
 </html>
-
-
-
-
-
