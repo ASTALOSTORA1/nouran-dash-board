@@ -955,68 +955,6 @@
                         local: true
                     };
                 }
-        // استبدلي دالة uploadImage بهذا المنطق المتطور
-// async function uploadImage(file) {
-//     state.isUploading = true;
-//     uploadProgress.classList.add('active');
-//     uploadProgressBar.style.width = '50%';
-//     uploadStatus.textContent = 'جاري معالجة الصورة...';
-
-//     return new Promise((resolve) => {
-//         const reader = new FileReader();
-//         reader.onloadend = function() {
-//             // هنا بنحول الصورة لـ Base64 عشان نقدر نخزنها في المتصفح وتفضل ظاهرة
-//             const base64String = reader.result;
-            
-//             uploadProgressBar.style.width = '100%';
-//             uploadStatus.textContent = '✅ تم التجهيز بنجاح';
-            
-//             setTimeout(() => {
-//                 uploadProgress.classList.remove('active');
-//             }, 1000);
-
-//             resolve({
-//                 url: base64String, // دي الصورة الحقيقية اللي رفعتيها مش رابط خارجي
-//                 filename: file.name,
-//                 local: true
-//             });
-//         };
-//         reader.readAsDataURL(file);
-//     });
-// }
-
-// // تعديل منطق حفظ الفورم (submit) عشان يضيف الصورة للمعرض فوراً
-// projectForm.addEventListener('submit', async (e) => {
-//     e.preventDefault();
-    
-//     if (!state.currentImageFile) {
-//         SweetAlert.fire('تنبيه', 'يرجى اختيار صورة أولاً', 'warning');
-//         return;
-//     }
-
-//     const result = await uploadImage(state.currentImageFile);
-    
-//     const newProject = {
-//         id: Date.now(),
-//         title: document.getElementById('projectTitle').value,
-//         description: document.getElementById('projectDescription').value,
-//         image: result.url, // الصورة اللي عالجناها فوق
-//         date: new Date().toISOString()
-//     };
-
-//     // حفظ في الـ state وفي الـ localStorage عشان ميروحش مع الـ Refresh
-//     state.projects.push(newProject);
-//     localStorage.setItem('nouran_gallery', JSON.stringify(state.projects));
-    
-//     SweetAlert.fire('تم بنجاح!', 'تمت إضافة الصورة لمعرضك الشخصي', 'success');
-    
-//     // تصفير الفورم والانتقال لصفحة المعرض
-//     projectForm.reset();
-//     imagePreviewContainer.classList.add('hidden');
-//     state.currentImageFile = null;
-//     renderProjects();
-//     menuProjects.click(); // انتقال تلقائي للمعرض عشان تشوفي النتيجة
-// });
                 
                 const response = await fetch(`${API_BASE_URL}/upload`, {
                     method: 'POST',
@@ -1798,5 +1736,3 @@
     </script>
 </body>
 </html>
-
-
