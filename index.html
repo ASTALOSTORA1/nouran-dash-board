@@ -3,40 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نوران سامح – المعرض الشخصي</title>
-    <!-- Font Awesome 6 -->
+    <title>نوران Sameh - Gallery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        /* ===== المتغيرات والإطار العام ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
-            --success: #4cc9f0;
             --danger: #f72585;
-            --light: #f8f9fa;
-            --dark: #212529;
             --gray: #6c757d;
             --border: #dee2e6;
-            --accent-gold: #ffb703;
         }
 
         body {
-            color: var(--dark);
+            color: #212529;
+            direction: rtl;
             min-height: 100vh;
             overflow-x: hidden;
-            background-color: #f5f7fb;
         }
 
-        /* ===== فيديو الخلفية (يظهر فقط في تسجيل الدخول) ===== */
         .video-background {
             position: fixed;
             top: 0;
@@ -46,6 +38,7 @@
             z-index: -1;
             overflow: hidden;
         }
+
         .video-background video {
             position: absolute;
             top: 50%;
@@ -54,279 +47,339 @@
             min-width: 100%;
             min-height: 100%;
             object-fit: cover;
-            filter: brightness(0.65) contrast(1.1);
+            filter: brightness(0.7);
         }
+
         .video-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(67, 97, 238, 0.45) 0%, rgba(58, 12, 163, 0.65) 100%);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.5), rgba(58, 12, 163, 0.7));
             z-index: 1;
         }
 
-        /* ===== حاوية تسجيل الدخول الأنيقة ===== */
-        .login-container {
-            max-width: 480px;
-            width: 90%;
-            padding: 2.8rem 2.2rem;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(10px);
-            border-radius: 32px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.25);
-            animation: fadeIn 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-            border: 1px solid rgba(255,255,255,0.4);
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            margin: 2rem;
-        }
-        .login-container::after {
-            content: "✧ البشمترجمة نوران ✧";
-            position: absolute;
-            bottom: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: white;
-            padding: 0.3rem 1.8rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(67,97,238,0.4);
-            white-space: nowrap;
+            z-index: 2;
         }
 
-        /* ===== شاشة لوحة التحكم ===== */
+        .login-container {
+            max-width: 450px;
+            width: 90%;
+            padding: 2.5rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+            color: white;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Dashboard */
         .dashboard-container {
             width: 100%;
             min-height: 100vh;
             display: flex;
-            background: #f0f3fa;
+            background: #f8fafc;
         }
 
-        /* الشريط الجانبي الفاخر */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(195deg, var(--primary) 0%, #2b4b9a 100%);
+            width: 260px;
+            background: linear-gradient(180deg, #1e293b, #0f172a);
             color: white;
-            display: flex;
-            flex-direction: column;
             position: fixed;
             height: 100vh;
             z-index: 100;
-            box-shadow: 0 0 30px rgba(0,0,0,0.15);
-            border-left: 1px solid rgba(255,255,255,0.15);
         }
+
         .sidebar-header {
-            padding: 2.2rem 1.5rem 1.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+
         .sidebar-header h2 {
-            font-size: 1.9rem;
-            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: white;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+
         .sidebar-menu {
-            flex: 1;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
         }
+
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 1rem 1.8rem;
-            color: rgba(255,255,255,0.85);
-            font-size: 1.1rem;
-            transition: 0.25s;
-            border-right: 5px solid transparent;
-            margin: 0.3rem 0;
+            padding: 1rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+            border-right: 4px solid transparent;
         }
-        .menu-item i {
-            margin-left: 1rem;
-            font-size: 1.4rem;
-            width: 28px;
-            text-align: center;
-        }
-        .menu-item:hover, .menu-item.active {
-            background: rgba(255,255,255,0.12);
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255,255,255,0.1);
             color: white;
-            border-right: 5px solid #ffd166;
-            padding-right: 2.2rem;
+            border-right-color: var(--primary);
+        }
+
+        .menu-item i {
+            margin-left: 0.75rem;
+            font-size: 1.2rem;
+            width: 24px;
         }
 
         .sidebar-footer {
-            padding: 1.8rem 1.5rem;
-            border-top: 1px solid rgba(255,255,255,0.15);
-        }
-        .user-info {
-            background: rgba(0,0,0,0.2);
-            border-radius: 18px;
-            padding: 1rem 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(5px);
-        }
-        .user-info i {
-            font-size: 2rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
         }
 
-        /* المحتوى الرئيسي */
         .main-content {
             flex: 1;
-            margin-right: 280px;
-            padding: 2.5rem;
+            margin-right: 260px;
+            padding: 2rem;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2.3rem;
-            padding: 1.6rem 2rem;
+            padding: 1.5rem;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.03);
-            border: 1px solid rgba(67,97,238,0.1);
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
         }
 
-        /* البطاقات والعناصر */
         .card {
             background: white;
-            border-radius: 28px;
-            padding: 2.2rem;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* منطقة رفع الصور – تصميم عصري */
         .upload-area {
-            border: 2.5px dashed #cbd5e1;
-            border-radius: 24px;
-            padding: 3rem 1.5rem;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 2.5rem;
             text-align: center;
-            background: #fafcff;
-            transition: 0.25s;
             cursor: pointer;
-        }
-        .upload-area:hover, .upload-area.dragover {
-            border-color: var(--primary);
-            background: rgba(67,97,238,0.04);
-            transform: scale(1.01);
-        }
-        .upload-area i {
-            font-size: 3.5rem;
-            color: var(--primary);
-            opacity: 0.8;
+            transition: 0.3s;
+            background: #f8fafc;
         }
 
-        /* شبكة الصور */
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .image-preview {
+            margin-top: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            background: #f1f5f9;
+        }
+
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 1.8rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
         }
+
         .project-card {
             background: white;
-            border-radius: 24px;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            border: 1px solid #edf2f7;
+            border: 1px solid #e2e8f0;
         }
+
         .project-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 30px rgba(67,97,238,0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
+
         .project-image {
-            height: 230px;
             width: 100%;
+            height: 200px;
             object-fit: cover;
-            transition: 0.4s;
-        }
-        .project-card:hover .project-image {
-            transform: scale(1.03);
         }
 
-        /* أزرار وألوان */
-        .btn {
-            display: inline-block;
-            padding: 0.8rem 1.7rem;
-            border-radius: 14px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1rem;
-        }
-        .btn-primary {
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 6px 18px rgba(67,97,238,0.35);
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 22px rgba(67,97,238,0.45);
-        }
-        .btn-danger {
-            background: linear-gradient(145deg, #f72585, #d1145a);
-            color: white;
+        .project-info {
+            padding: 1.25rem;
         }
 
-        /* التجاوب */
-        @media (max-width: 992px) {
-            .sidebar { width: 100px; }
-            .sidebar span, .user-info span { display: none; }
-            .main-content { margin-right: 100px; }
-            .sidebar-header h2 i { margin: 0 auto; }
-            .sidebar-header h2 span { display: none; }
-        }
-        @media (max-width: 700px) {
-            .dashboard-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-right: 0; padding: 1.5rem; }
+        .project-title {
+            font-size: 1.2rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
         }
 
-        /* إضافات جمالية */
-        .stat-item {
-            background: linear-gradient(145deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 0.6rem 1.3rem;
-            border-radius: 40px;
-            font-weight: 600;
-            display: inline-block;
+        .project-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
-        .hidden {
-            display: none !important;
+
+        .project-actions {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
         }
-        .file-info {
-            background: #eef2ff;
-            padding: 0.8rem;
-            border-radius: 16px;
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
             margin-top: 1rem;
         }
-        .upload-progress {
-            width: 100%;
-            height: 10px;
-            background: #e2e8f0;
-            border-radius: 10px;
-            margin-top: 1.2rem;
-            overflow: hidden;
-            display: none;
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
-        .upload-progress.active {
-            display: block;
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
         }
-        .upload-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary), #06d6a0);
-            transition: width 0.3s;
+
+        .stat-item {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar span:not(.user-info span) {
+                display: none;
+            }
+            .main-content {
+                margin-right: 80px;
+            }
+            .sidebar-header h2 span {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -335,66 +388,70 @@
     <div id="videoBackground" class="video-background">
         <video autoplay muted loop playsinline>
             <source src="https://michellegore.com/wp-content/uploads/2020/12/Background-Animation.mp4" type="video/mp4">
-            متصفحك لا يدعم تشغيل الفيديو.
         </video>
         <div class="video-overlay"></div>
     </div>
 
     <!-- صفحة تسجيل الدخول -->
-    <div id="loginPage" class="container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+    <div id="loginPage" class="container">
         <div class="login-container">
-            <div class="login-header" style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="color: var(--primary); font-size: 2.3rem;"><i class="fas fa-images"></i> معرض نوران</h1>
-                <p style="color: var(--gray);">لوحة تحكم الباشمترجمة نوران ☝</p>
+            <div class="login-header">
+                <h1><i class="fas fa-images"></i> معرض نوران</h1>
+                <p style="color: #64748b;">الباشمترجمة نوران سامح</p>
             </div>
             
             <form id="loginForm">
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.6rem; font-weight: 600;"><i class="fas fa-user"></i> اسم المستخدم</label>
-                    <input type="text" id="username" class="form-control" style="width: 100%; padding: 0.9rem; border: 2px solid #e2e8f0; border-radius: 14px;" placeholder="أدخل اسم المستخدم" required>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> اسم المستخدم</label>
+                    <input type="text" id="username" class="form-control" placeholder="nouran sameh" required>
                 </div>
-                <div class="form-group" style="margin-bottom: 2rem;">
-                    <label style="display: block; margin-bottom: 0.6rem; font-weight: 600;"><i class="fas fa-lock"></i> كلمة المرور</label>
-                    <input type="password" id="password" class="form-control" style="width: 100%; padding: 0.9rem; border: 2px solid #e2e8f0; border-radius: 14px;" placeholder="أدخل كلمة المرور" required>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <input type="password" id="password" class="form-control" placeholder="22-4-2025" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.2rem;">
-                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> دخول
                 </button>
             </form>
-            <div id="loginError" class="alert alert-danger hidden" style="margin-top: 1.5rem; padding: 1rem; background: #fee2e2; border-radius: 14px; color: #b91c1c;">
-                <i class="fas fa-exclamation-circle"></i> 
-                <span id="errorMessage">اسم المستخدم أو كلمة المرور غير صحيحة</span>
+            
+            <div id="loginError" class="alert alert-danger hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMessage"></span>
             </div>
         </div>
     </div>
 
     <!-- الداشبورد -->
     <div id="dashboardPage" class="dashboard-container hidden">
-        <!-- الشريط الجانبي -->
+        <!-- سايد بار -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-images"></i><span> معرض نوران</span></h2>
+                <h2>
+                    <i class="fas fa-images"></i>
+                    <span>معرض نوران</span>
+                </h2>
             </div>
+            
             <div class="sidebar-menu">
                 <a class="menu-item active" id="menuAdd">
                     <i class="fas fa-plus-circle"></i>
-                    <span>إضافة صورة جديدة</span>
+                    <span>إضافة صورة</span>
                 </a>
                 <a class="menu-item" id="menuProjects">
                     <i class="fas fa-images"></i>
-                    <span>معرض الصور</span>
+                    <span>المعرض</span>
                 </a>
             </div>
+            
             <div class="sidebar-footer">
-                <div class="user-info">
+                <div style="margin-bottom: 1rem; color: rgba(255,255,255,0.9);">
                     <i class="fas fa-user-circle"></i>
-                    <div>
-                        <span id="loggedInUser">مرحباً، نوران</span>
-                        <div style="font-size: 0.8rem; opacity: 0.9;"><i class="fas fa-clock"></i> <span id="loginTime"></span></div>
-                    </div>
+                    <span id="loggedInUser">نوران سامح</span>
                 </div>
-                <button id="logoutBtn" class="btn" style="background: rgba(255,255,255,0.15); color: white; width: 100%; margin-top: 1rem; padding: 0.9rem;">
-                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                <button id="logoutBtn" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> خروج
                 </button>
             </div>
         </div>
@@ -404,57 +461,45 @@
             <!-- صفحة إضافة صورة -->
             <div id="addPage" class="page">
                 <div class="header">
-                    <h1 style="display: flex; align-items: center; gap: 12px;"><i class="fas fa-plus-circle" style="color: var(--primary);"></i> إضافة صورة جديدة</h1>
+                    <h1><i class="fas fa-plus-circle" style="color: var(--primary);"></i> إضافة صورة جديدة</h1>
                     <span id="addPageStats" class="stat-item">0 صور</span>
                 </div>
+                
                 <div class="card">
-                    <div id="localModeNotification" class="hidden" style="background: #fff3cd; border-right: 6px solid #ffc107; padding: 1rem; border-radius: 16px; margin-bottom: 2rem;">
-                        <i class="fas fa-info-circle"></i> الوضع المحلي: يتم حفظ الصور محلياً فقط.
-                    </div>
                     <form id="projectForm">
-                        <div class="form-group" style="margin-bottom: 1.8rem;">
-                            <label style="font-weight: 700; display: block; margin-bottom: 0.6rem;"><i class="fas fa-heading"></i> عنوان الصورة</label>
-                            <input type="text" id="projectTitle" class="form-control" style="width: 100%; padding: 0.9rem; border: 2px solid #e2e8f0; border-radius: 16px;" placeholder="أدخل عنواناً للصورة" required>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 1.8rem;">
-                            <label style="font-weight: 700; display: block; margin-bottom: 0.6rem;"><i class="fas fa-align-left"></i> وصف الصورة</label>
-                            <textarea id="projectDescription" class="form-control" rows="3" style="width: 100%; padding: 0.9rem; border: 2px solid #e2e8f0; border-radius: 16px;" placeholder="أدخل وصفاً للصورة" required></textarea>
+                        <div class="form-group">
+                            <label><i class="fas fa-heading"></i> عنوان الصورة</label>
+                            <input type="text" id="projectTitle" class="form-control" placeholder="مثلاً: صورة شخصية" required>
                         </div>
                         
                         <div class="form-group">
-                            <label style="font-weight: 700; display: block; margin-bottom: 0.6rem;"><i class="fas fa-image"></i> اختر الصورة</label>
-                            <div class="upload-area" id="uploadArea">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p style="font-size: 1.2rem; margin: 12px 0 6px;">اسحب وأفلت الصورة هنا</p>
-                                <p style="color: var(--gray); margin-bottom: 20px;">أو انقر للاختيار</p>
-                                <input type="file" id="imageFile" accept="image/*" style="display: none;">
-                                <p style="color: var(--gray); font-size: 0.9rem;"><i class="fas fa-check-circle"></i> يدعم: JPG, PNG, GIF, WebP, BMP, SVG (كل الأحجام)</p>
-                            </div>
-                            
-                            <div id="imagePreviewContainer" class="hidden" style="margin-top: 1.8rem;">
-                                <div class="image-preview" style="border-radius: 20px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                                    <img id="imagePreview" src="#" alt="معاينة الصورة" style="width: 100%; max-height: 320px; object-fit: contain; background: #f1f5f9;">
-                                </div>
-                                <div class="file-info" id="fileInfo">
-                                    <i class="fas fa-file-image"></i>
-                                    <span id="fileName"></span>
-                                    <span id="fileSize"></span>
-                                    <span id="imageDimensions" style="margin-right: 10px; color: var(--secondary);"></span>
-                                </div>
-                                <div style="margin-top: 0.8rem; display: flex; gap: 10px;">
-                                    <span style="background: #e6f7e6; padding: 0.4rem 1rem; border-radius: 30px; font-size: 0.85rem;"><i class="fas fa-check"></i> تم التحميل</span>
-                                    <span id="imageType" style="background: #e6f0ff; padding: 0.4rem 1rem; border-radius: 30px; font-size: 0.85rem;"></span>
-                                </div>
-                            </div>
-                            
-                            <div class="upload-progress" id="uploadProgress">
-                                <div class="upload-progress-bar" id="uploadProgressBar"></div>
-                            </div>
-                            <div id="uploadStatus" style="margin-top: 0.8rem; font-weight: 500;"></div>
+                            <label><i class="fas fa-align-left"></i> وصف الصورة</label>
+                            <textarea id="projectDescription" class="form-control" rows="3" placeholder="وصف مختصر للصورة" required></textarea>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary" id="submitBtn" style="width: 100%; padding: 1.2rem; font-size: 1.2rem; margin-top: 1.5rem;">
-                            <i class="fas fa-save"></i> حفظ الصورة في المعرض
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> الصورة</label>
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">اسحب الصورة أو اضغط لاختيارها</p>
+                                <p style="color: var(--gray);">أي حجم مسموح</p>
+                                <input type="file" id="imageFile" accept="image/*" class="hidden">
+                            </div>
+                            
+                            <div id="imagePreviewContainer" class="hidden">
+                                <div class="image-preview">
+                                    <img id="imagePreview" src="" alt="معاينة">
+                                </div>
+                                <div style="background: #f1f5f9; padding: 0.75rem; border-radius: 8px; margin-top: 0.75rem;">
+                                    <i class="fas fa-file-image"></i>
+                                    <span id="fileName"></span>
+                                    <span id="fileSize" style="margin-right: 0.5rem;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="margin-top: 1rem;">
+                            <i class="fas fa-save"></i> حفظ الصورة
                         </button>
                     </form>
                 </div>
@@ -463,13 +508,16 @@
             <!-- صفحة المعرض -->
             <div id="projectsPage" class="page hidden">
                 <div class="header">
-                    <h1 style="display: flex; gap: 12px;"><i class="fas fa-images" style="color: var(--primary);"></i> معرض الصور الشخصي</h1>
+                    <h1><i class="fas fa-images" style="color: var(--primary);"></i> المعرض الشخصي</h1>
                     <span id="projectsCount" class="stat-item">0 صور</span>
                 </div>
+                
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem;">
-                        <h2 style="display: flex; gap: 10px; color: var(--secondary);"><i class="fas fa-photo-video"></i> جميع الصور</h2>
-                        <button id="clearAllBtn" style="display:none;" class="btn btn-danger"><i class="fas fa-trash-alt"></i> مسح الكل</button>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 style="color: var(--secondary);">جميع الصور</h2>
+                        <button id="clearAllBtn" class="btn btn-danger" style="display: none;">
+                            <i class="fas fa-trash-alt"></i> مسح الكل
+                        </button>
                     </div>
                     <div id="projectsList"></div>
                 </div>
@@ -478,39 +526,38 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // ================ الإعدادات والمتغيرات العالمية ================
-        const API_BASE_URL = 'https://nouran-server.vercel.app/api';
-        const DEFAULT_CREDENTIALS = { username: 'nouran sameh', password: '22-4-2025' };
-        
-        // حالة التطبيق
-        const state = {
-            currentUser: null,
-            token: localStorage.getItem('token') || null,
-            projects: [],
-            currentImageFile: null,
-            isUploading: false,
-            loginTime: localStorage.getItem('loginTime') ? new Date(localStorage.getItem('loginTime')) : null
+        // ==================== الاعدادات ====================
+        const API_URL = 'https://nouran-server.vercel.app/api';
+        const LOGIN_DATA = {
+            username: 'nouran sameh',
+            password: '22-4-2025'
         };
 
-        // تحميل المشاريع المحفوظة محلياً
-        if (localStorage.getItem('local_projects')) {
-            try {
-                state.projects = JSON.parse(localStorage.getItem('local_projects')) || [];
-            } catch(e) { state.projects = []; }
+        // ==================== State ====================
+        let currentUser = null;
+        let token = localStorage.getItem('token') || null;
+        let projects = [];
+        let currentFile = null;
+
+        // تحميل المشاريع المحفوظة
+        try {
+            const saved = localStorage.getItem('projects');
+            if (saved) projects = JSON.parse(saved);
+        } catch(e) {
+            projects = [];
         }
 
-        // ================ عناصر DOM ================
+        // ==================== DOM Elements ====================
         const loginPage = document.getElementById('loginPage');
         const dashboardPage = document.getElementById('dashboardPage');
-        const videoBackground = document.getElementById('videoBackground');
+        const videoBg = document.getElementById('videoBackground');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
-        const errorMessage = document.getElementById('errorMessage');
+        const errorMsg = document.getElementById('errorMessage');
         const logoutBtn = document.getElementById('logoutBtn');
         const loggedInUser = document.getElementById('loggedInUser');
-        const loginTimeEl = document.getElementById('loginTime');
-        const localModeNotification = document.getElementById('localModeNotification');
         const menuAdd = document.getElementById('menuAdd');
         const menuProjects = document.getElementById('menuProjects');
         const addPage = document.getElementById('addPage');
@@ -520,212 +567,202 @@
         const imageFile = document.getElementById('imageFile');
         const uploadArea = document.getElementById('uploadArea');
         const imagePreview = document.getElementById('imagePreview');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const previewContainer = document.getElementById('imagePreviewContainer');
         const fileName = document.getElementById('fileName');
         const fileSize = document.getElementById('fileSize');
-        const imageDimensions = document.getElementById('imageDimensions');
-        const imageType = document.getElementById('imageType');
-        const uploadProgress = document.getElementById('uploadProgress');
-        const uploadProgressBar = document.getElementById('uploadProgressBar');
-        const uploadStatus = document.getElementById('uploadStatus');
         const submitBtn = document.getElementById('submitBtn');
         const projectsList = document.getElementById('projectsList');
         const projectsCount = document.getElementById('projectsCount');
-        const clearAllBtn = document.getElementById('clearAllBtn');
 
-        // ================ دوال مساعدة ================
-        const formatFileSize = (bytes) => {
+        // ==================== Helper Functions ====================
+        function formatBytes(bytes) {
             if (!bytes || bytes === 0) return '0 Bytes';
             if (bytes < 1024) return bytes + ' Bytes';
             if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
             return (bytes / 1048576).toFixed(2) + ' MB';
-        };
+        }
 
-        const formatDate = (date) => {
-            return new Date(date).toLocaleDateString('ar-EG', { 
-                year: 'numeric', month: 'long', day: 'numeric' 
-            });
-        };
-
-        // ================ معالجة الصورة - تم إصلاح مشكلة الحجم الصغير ================
-        function handleImageFile(file) {
+        // ==================== Image Handler - بدون أي قيود ====================
+        function handleImage(file) {
             if (!file) return;
             
-            // التأكد من أن الملف هو صورة
-            if (!file.type.startsWith('image/')) {
-                Swal.fire('خطأ', 'الرجاء اختيار ملف صورة فقط', 'error');
-                return;
-            }
-
-            // تم إزالة شرط الحجم الأقصى – كل الأحجام مسموحة
-            // حتى الصفر بايت سيتم التعامل معها
+            // مش هنعمل أي شرط ولا منع خالص
+            // حتى لو الملف 0 بايت أو 100 ميجا هينفع
             
-            state.currentImageFile = file;
+            currentFile = file;
             
-            // عرض معلومات الملف
+            // عرض المعلومات
             fileName.textContent = file.name;
-            fileSize.textContent = `(${formatFileSize(file.size)})`;
-            imageType.textContent = file.type.split('/')[1]?.toUpperCase() || 'غير معروف';
+            fileSize.textContent = `(${formatBytes(file.size)})`;
             
-            // معاينة الصورة حتى لو كانت صغيرة جداً
+            // المعاينة
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;
-                imagePreviewContainer.classList.remove('hidden');
-                
-                // محاولة الحصول على أبعاد الصورة
-                const img = new Image();
-                img.onload = function() {
-                    imageDimensions.textContent = `${this.width} × ${this.height} بكسل`;
-                };
-                img.onerror = function() {
-                    imageDimensions.textContent = 'أبعاد غير معروفة';
-                };
-                img.src = e.target.result;
-                
-                uploadStatus.textContent = '✅ الصورة جاهزة للرفع';
-                uploadStatus.style.color = 'green';
+                previewContainer.classList.remove('hidden');
             };
-            
-            // في حالة الصور الصغيرة جداً، FileReader قد يعمل بسرعة
-            try {
-                reader.readAsDataURL(file);
-            } catch (e) {
-                console.error('خطأ في قراءة الملف:', e);
-                // محاولة بديلة للملفات الصغيرة جداً
-                if (file.size === 0) {
-                    Swal.fire('تنبيه', 'الملف فارغ (0 بايت). تأكدي من اختيار صورة صحيحة.', 'warning');
-                }
-            }
+            reader.readAsDataURL(file);
         }
 
-        // ================ أحداث رفع الملفات ================
+        // ==================== Upload Events ====================
         uploadArea.addEventListener('click', () => imageFile.click());
-
+        
         imageFile.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) handleImageFile(e.target.files[0]);
+            if (e.target.files[0]) handleImage(e.target.files[0]);
         });
 
         ['dragover', 'dragenter'].forEach(event => {
             uploadArea.addEventListener(event, (e) => {
                 e.preventDefault();
-                uploadArea.classList.add('dragover');
+                uploadArea.style.borderColor = '#4361ee';
+                uploadArea.style.background = 'rgba(67,97,238,0.05)';
             });
         });
 
         ['dragleave', 'drop'].forEach(event => {
             uploadArea.addEventListener(event, (e) => {
                 e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                if (event === 'drop' && e.dataTransfer.files.length) {
+                uploadArea.style.borderColor = '#cbd5e0';
+                uploadArea.style.background = '#f8fafc';
+                
+                if (event === 'drop' && e.dataTransfer.files[0]) {
                     const file = e.dataTransfer.files[0];
-                    if (file.type.startsWith('image/')) handleImageFile(file);
-                    else Swal.fire('خطأ', 'الرجاء إفلات صورة فقط', 'warning');
+                    if (file.type.startsWith('image/')) {
+                        handleImage(file);
+                    } else {
+                        Swal.fire('خطأ', 'الملف يجب أن يكون صورة', 'error');
+                    }
                 }
             });
         });
 
-        // ================ رفع الصورة - متوافق مع جميع الأحجام ================
-        async function uploadImage(file) {
-            // محاكاة رفع الصورة – تعمل مع أي حجم حتى 0 بايت
-            uploadProgress.classList.add('active');
-            uploadProgressBar.style.width = '30%';
-            uploadStatus.textContent = 'جاري تجهيز الصورة...';
+        // ==================== Login - محاولة السيرفر أولاً ====================
+        async function loginUser(username, password) {
+            // الأول هنحاول السيرفر
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        token = data.token;
+                        currentUser = data.user;
+                        localStorage.setItem('token', token);
+                        return { success: true, server: true };
+                    }
+                }
+            } catch (error) {
+                console.log('السيرفر مش شغال، هنستخدم الدخول المحلي');
+            }
             
-            return new Promise((resolve) => {
-                // قراءة الصورة وتحويلها إلى Base64 (يعمل مع جميع الأحجام)
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadProgressBar.style.width = '80%';
-                    uploadStatus.textContent = 'تمت القراءة بنجاح...';
-                    
-                    setTimeout(() => {
-                        uploadProgressBar.style.width = '100%';
-                        setTimeout(() => {
-                            uploadProgress.classList.remove('active');
-                            uploadProgressBar.style.width = '0%';
-                        }, 600);
-                        
-                        // إرجاع URL الصورة (Base64 للمحلي)
-                        resolve({
-                            url: e.target.result,  // Base64 – يعمل مع الصفر بايت أيضاً
-                            filename: file.name,
-                            local: true,
-                            size: file.size
-                        });
-                    }, 300);
-                };
-                
-                reader.onerror = function() {
-                    // إذا فشل، نستخدم رابط افتراضي
-                    uploadStatus.textContent = '⚠️ استخدام صورة بديلة';
-                    resolve({
-                        url: 'https://via.placeholder.com/600x400?text=نوران+سامح',
-                        filename: file.name || 'placeholder.jpg',
-                        local: true
-                    });
-                };
-                
-                reader.readAsDataURL(file);
-            });
+            // لو السيرفر فشل، نستخدم الدخول المحلي
+            if (username.toLowerCase() === LOGIN_DATA.username.toLowerCase() && 
+                password === LOGIN_DATA.password) {
+                token = 'local-token';
+                currentUser = { username: 'نوران سامح' };
+                localStorage.setItem('token', token);
+                return { success: true, server: false };
+            }
+            
+            throw new Error('بيانات الدخول غلط');
         }
 
-        // ================ إنشاء مشروع (صورة) ================
-        async function createProject(projectData) {
+        // ==================== Projects Management ====================
+        async function fetchProjects() {
+            // الأول نحاول من السيرفر
+            if (token && token !== 'local-token') {
+                try {
+                    const response = await fetch(`${API_URL}/projects`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.data) {
+                            projects = data.data;
+                            localStorage.setItem('projects', JSON.stringify(projects));
+                            renderProjects();
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('فشل جلب المشاريع من السيرفر');
+                }
+            }
+            
+            // لو فشل، نستخدم المحلي
+            renderProjects();
+        }
+
+        async function createProject(data) {
+            // الأول نحفظ محلياً (دائماً)
             const newProject = {
-                _id: 'local-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
-                title: projectData.title,
-                description: projectData.description,
-                imageUrl: projectData.imageUrl,
+                _id: Date.now() + '-' + Math.random(),
+                title: data.title,
+                description: data.description,
+                imageUrl: data.imageUrl,
                 uploadedAt: new Date().toISOString(),
-                local: true,
-                fileSize: projectData.fileSize || 0
+                local: true
             };
             
-            state.projects.push(newProject);
-            localStorage.setItem('local_projects', JSON.stringify(state.projects));
+            projects.unshift(newProject);
+            localStorage.setItem('projects', JSON.stringify(projects));
+            
+            // بعدين نحاول السيرفر لو موجود
+            if (token && token !== 'local-token') {
+                try {
+                    await fetch(`${API_URL}/projects`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } catch (e) {
+                    console.log('فشل حفظ في السيرفر');
+                }
+            }
+            
             return newProject;
         }
 
-        // ================ عرض المشاريع ================
+        // ==================== Render Projects ====================
         function renderProjects() {
-            if (state.projects.length === 0) {
+            if (projects.length === 0) {
                 projectsList.innerHTML = `
-                    <div style="text-align: center; padding: 4rem 2rem; color: var(--gray);">
-                        <i class="fas fa-images" style="font-size: 5rem; opacity: 0.3; margin-bottom: 1.5rem;"></i>
-                        <h3 style="color: var(--secondary);">المعرض فارغ</h3>
-                        <p style="margin: 1rem 0;">أضفي أول صورة الآن</p>
-                        <button class="btn btn-primary" onclick="document.getElementById('menuAdd').click()">
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <i class="fas fa-images" style="font-size: 5rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
+                        <h3 style="color: #64748b;">المعرض فاضي</h3>
+                        <p style="margin-top: 0.5rem;">أضيفي أول صورة دلوقتي</p>
+                        <button onclick="document.getElementById('menuAdd').click()" class="btn btn-primary" style="margin-top: 1.5rem;">
                             <i class="fas fa-plus-circle"></i> إضافة صورة
                         </button>
                     </div>
                 `;
                 projectsCount.textContent = '0 صور';
-                addPageStats.textContent = '0 صور في المعرض';
+                addPageStats.textContent = '0 صور';
                 return;
             }
             
             let html = '<div class="projects-grid">';
-            state.projects.forEach(project => {
-                const dateStr = formatDate(project.uploadedAt);
-                const sizeInfo = project.fileSize ? formatFileSize(project.fileSize) : '';
-                
+            projects.forEach(project => {
                 html += `
                     <div class="project-card">
-                        <div style="position: relative;">
-                            <img src="${project.imageUrl}" alt="${project.title}" class="project-image" 
-                                 onerror="this.src='https://via.placeholder.com/600x400?text=نوران'">
-                            <span style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem;">
-                                <i class="fas fa-calendar"></i> ${dateStr}
-                            </span>
+                        <img src="${project.imageUrl}" alt="${project.title}" class="project-image" 
+                             onerror="this.src='https://via.placeholder.com/400x300?text=نوران'">
+                        <div class="project-info">
+                            <h3 class="project-title">${project.title}</h3>
+                            <p class="project-description">${project.description}</p>
+                            <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem;">
+                                <i class="fas fa-calendar"></i> ${new Date(project.uploadedAt).toLocaleDateString('ar-EG')}
+                            </p>
                         </div>
-                        <div class="project-info" style="padding: 1.5rem;">
-                            <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">${project.title}</h3>
-                            <p style="color: var(--gray); line-height: 1.6;">${project.description}</p>
-                            ${sizeInfo ? `<p style="font-size: 0.8rem; color: #64748b; margin-top: 0.5rem;"><i class="fas fa-database"></i> ${sizeInfo}</p>` : ''}
-                        </div>
-                        <div style="padding: 1rem 1.5rem 1.5rem; border-top: 1px solid #edf2f7;">
-                            <button class="btn btn-danger delete-project" data-id="${project._id}" style="padding: 0.6rem 1.2rem; font-size: 0.95rem;">
+                        <div class="project-actions">
+                            <button onclick="deleteProject('${project._id}')" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
                                 <i class="fas fa-trash-alt"></i> حذف
                             </button>
                         </div>
@@ -733,124 +770,48 @@
                 `;
             });
             html += '</div>';
+            
             projectsList.innerHTML = html;
-            
-            projectsCount.textContent = `${state.projects.length} ${state.projects.length === 1 ? 'صورة' : 'صور'}`;
-            addPageStats.textContent = `${state.projects.length} صور في المعرض`;
-            
-            // إضافة حدث الحذف
-            document.querySelectorAll('.delete-project').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const projectId = this.dataset.id;
-                    const result = await Swal.fire({
-                        title: 'تأكيد الحذف',
-                        text: 'هل أنت متأكدة من حذف هذه الصورة؟',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonText: 'نعم، احذفي',
-                        cancelButtonText: 'إلغاء'
-                    });
-                    
-                    if (result.isConfirmed) {
-                        state.projects = state.projects.filter(p => p._id !== projectId);
-                        localStorage.setItem('local_projects', JSON.stringify(state.projects));
-                        renderProjects();
-                        Swal.fire('تم الحذف', 'تم حذف الصورة بنجاح', 'success');
-                    }
-                });
-            });
+            projectsCount.textContent = `${projects.length} ${projects.length === 1 ? 'صورة' : 'صور'}`;
+            addPageStats.textContent = `${projects.length} صور`;
         }
 
-        // ================ تسجيل الدخول ================
-        async function login(username, password) {
-            if (username.trim().toLowerCase() === DEFAULT_CREDENTIALS.username.toLowerCase() && 
-                password === DEFAULT_CREDENTIALS.password) {
-                state.currentUser = { username: 'نوران سامح' };
-                state.token = 'local-auth-token';
-                state.loginTime = new Date();
-                localStorage.setItem('token', 'local-auth-token');
-                localStorage.setItem('loginTime', state.loginTime.toISOString());
-                return true;
-            }
-            throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة');
-        }
-
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                await login(username, password);
-                showDashboard();
-                loginError.classList.add('hidden');
-                Swal.fire({
-                    title: 'أهلاً بك يا باشمترجمة',
-                    text: 'تم تسجيل الدخول بنجاح',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } catch (err) {
-                loginError.classList.remove('hidden');
-                errorMessage.textContent = err.message;
-            }
-        });
-
-        // ================ إظهار لوحة التحكم ================
-        function showDashboard() {
-            loginPage.style.display = 'none';
-            dashboardPage.classList.remove('hidden');
-            videoBackground.classList.add('hidden');
-            
-            if (state.currentUser) loggedInUser.textContent = `مرحباً، ${state.currentUser.username}`;
-            if (state.loginTime) {
-                loginTimeEl.textContent = state.loginTime.toLocaleTimeString('ar-EG');
-            }
-            
-            if (state.token === 'local-auth-token') {
-                localModeNotification.classList.remove('hidden');
-            }
-            
-            renderProjects();
-            switchPage('addPage');
-        }
-
-        function switchPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-            if (pageId === 'addPage') menuAdd.classList.add('active');
-            else if (pageId === 'projectsPage') menuProjects.classList.add('active');
-        }
-
-        // ================ تسجيل الخروج ================
-        logoutBtn.addEventListener('click', async () => {
+        // ==================== Delete Project ====================
+        window.deleteProject = async function(id) {
             const result = await Swal.fire({
-                title: 'تسجيل الخروج',
-                text: 'هل أنت متأكدة من تسجيل الخروج؟',
-                icon: 'question',
+                title: 'تأكيد الحذف',
+                text: 'هتحذفي الصورة دي؟',
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'نعم',
-                cancelButtonText: 'إلغاء'
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'لا'
             });
+            
             if (result.isConfirmed) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('loginTime');
-                state.currentUser = null;
-                state.token = null;
-                loginPage.style.display = 'flex';
-                dashboardPage.classList.add('hidden');
-                videoBackground.classList.remove('hidden');
+                projects = projects.filter(p => p._id !== id);
+                localStorage.setItem('projects', JSON.stringify(projects));
+                renderProjects();
+                
+                // حاول تحذف من السيرفر
+                if (token && token !== 'local-token') {
+                    try {
+                        await fetch(`${API_URL}/projects/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    } catch (e) {}
+                }
+                
+                Swal.fire('تم الحذف', '', 'success');
             }
-        });
+        };
 
-        // ================ إرسال النموذج (إضافة صورة) ================
+        // ==================== Form Submit ====================
         projectForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if (!state.currentImageFile) {
-                Swal.fire('تنبيه', 'الرجاء اختيار صورة أولاً', 'warning');
+            if (!currentFile) {
+                Swal.fire('تنبيه', 'اختاري صورة أولاً', 'warning');
                 return;
             }
             
@@ -858,7 +819,7 @@
             const description = document.getElementById('projectDescription').value.trim();
             
             if (!title || !description) {
-                Swal.fire('تنبيه', 'الرجاء إدخال عنوان ووصف الصورة', 'warning');
+                Swal.fire('تنبيه', 'اكتبي عنوان ووصف للصورة', 'warning');
                 return;
             }
             
@@ -866,59 +827,162 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
             
             try {
-                const uploadResult = await uploadImage(state.currentImageFile);
-                await createProject({
-                    title,
-                    description,
-                    imageUrl: uploadResult.url,
-                    fileSize: uploadResult.size
-                });
+                // تحويل الصورة لـ Base64
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const imageUrl = e.target.result;
+                    
+                    await createProject({
+                        title,
+                        description,
+                        imageUrl,
+                        uploadedAt: new Date().toISOString()
+                    });
+                    
+                    // reset form
+                    projectForm.reset();
+                    previewContainer.classList.add('hidden');
+                    currentFile = null;
+                    
+                    renderProjects();
+                    
+                    Swal.fire({
+                        title: 'تم الحفظ',
+                        text: 'الصورة اتحفظت في المعرض',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    switchPage('projectsPage');
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ الصورة';
+                };
+                reader.readAsDataURL(currentFile);
                 
-                projectForm.reset();
-                imagePreviewContainer.classList.add('hidden');
-                state.currentImageFile = null;
-                uploadStatus.textContent = '';
+            } catch (error) {
+                Swal.fire('خطأ', 'فشل حفظ الصورة', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ الصورة';
+            }
+        });
+
+        // ==================== Login Form ====================
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
+            loginError.classList.add('hidden');
+            
+            try {
+                const result = await loginUser(username, password);
+                
+                // دخول ناجح
+                loginPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+                videoBg.classList.add('hidden');
+                
+                loggedInUser.textContent = `نوران سامح`;
+                
+                // جلب المشاريع
+                await fetchProjects();
                 
                 Swal.fire({
-                    title: '✅ تمت الإضافة',
-                    text: 'تم حفظ الصورة في المعرض',
+                    title: '❤️ أهلاً نوران',
+                    text: result.server ? 'متصل بالسيرفر' : 'وضع غير متصل - حفظ محلي',
                     icon: 'success',
                     timer: 2000,
                     showConfirmButton: false
                 });
                 
-                renderProjects();
-                switchPage('projectsPage');
-                
             } catch (error) {
-                Swal.fire('خطأ', 'فشل في حفظ الصورة: ' + error.message, 'error');
+                loginError.classList.remove('hidden');
+                errorMsg.textContent = error.message;
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ الصورة في المعرض';
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
             }
         });
 
-        // ================ أحداث التنقل ================
+        // ==================== Logout ====================
+        logoutBtn.addEventListener('click', async function() {
+            const result = await Swal.fire({
+                title: 'تسجيل الخروج',
+                text: 'هتخرجي من المعرض؟',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'خروج',
+                cancelButtonText: 'إلغاء'
+            });
+            
+            if (result.isConfirmed) {
+                localStorage.removeItem('token');
+                token = null;
+                currentUser = null;
+                
+                loginPage.classList.remove('hidden');
+                dashboardPage.classList.add('hidden');
+                videoBg.classList.remove('hidden');
+            }
+        });
+
+        // ==================== Navigation ====================
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            if (pageId === 'addPage') menuAdd.classList.add('active');
+            else menuProjects.classList.add('active');
+        }
+
         menuAdd.addEventListener('click', () => switchPage('addPage'));
         menuProjects.addEventListener('click', () => switchPage('projectsPage'));
 
-        // ================ التحقق من الجلسة عند بدء التشغيل ================
-        function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (token) {
-                state.token = token;
-                state.currentUser = { username: 'نوران سامح' };
-                state.loginTime = localStorage.getItem('loginTime') ? new Date(localStorage.getItem('loginTime')) : new Date();
-                showDashboard();
-            } else {
-                loginPage.style.display = 'flex';
-                dashboardPage.classList.add('hidden');
-                videoBackground.classList.remove('hidden');
+        // ==================== Check Auth on Load ====================
+        async function checkAuth() {
+            const savedToken = localStorage.getItem('token');
+            
+            if (savedToken) {
+                token = savedToken;
+                currentUser = { username: 'نوران سامح' };
+                
+                loginPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+                videoBg.classList.add('hidden');
+                
+                loggedInUser.textContent = 'نوران سامح';
+                await fetchProjects();
             }
         }
 
-        // بدء التطبيق
+        // Start
         checkAuth();
+
+        // Clear All Button (hidden by default)
+        document.getElementById('clearAllBtn').addEventListener('click', async function() {
+            const result = await Swal.fire({
+                title: 'مسح الكل',
+                text: 'هتمسحي كل الصور؟',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'نعم',
+                cancelButtonText: 'لا'
+            });
+            
+            if (result.isConfirmed) {
+                projects = [];
+                localStorage.setItem('projects', JSON.stringify(projects));
+                renderProjects();
+                Swal.fire('تم المسح', '', 'success');
+            }
+        });
     </script>
 </body>
 </html>
