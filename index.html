@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نوران سامح - المعرض الشخصي</title>
+    <title>Nouran Sameh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        /* نفس ال CSS بتاعك بس نضيف حاجة صغيرة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -18,42 +24,123 @@
             --gray: #6c757d;
             --border: #dee2e6;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            direction: rtl;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        .server-status {
+
+        /* فيديو الخلفية */
+        .video-background {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            filter: brightness(0.7) contrast(1.1);
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.4) 0%, rgba(58, 12, 163, 0.6) 100%);
+            z-index: 1;
+        }
+
+        /* صفحة تسجيل الدخول */
+        .login-container {
+            max-width: 450px;
+            width: 90%;
+            padding: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin: 2rem;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            font-size: 2.2rem;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            font-size: 0.9rem;
         }
-        
-        .server-status.connected {
-            border-right: 4px solid #4cc9f0;
+
+        .login-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
         }
-        
-        .server-status.disconnected {
-            border-right: 4px solid #f72585;
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
         }
-        
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
         .btn {
             display: inline-block;
             padding: 0.85rem 1.5rem;
@@ -69,130 +156,622 @@
             text-align: center;
             box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
         }
-        
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
         .btn-danger {
             background: linear-gradient(135deg, var(--danger), #e11574);
         }
-        
-        .server-input {
-            direction: ltr;
-            text-align: left;
-            font-family: monospace;
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(247, 37, 133, 0.4);
         }
-        
-        .login-container {
-            max-width: 500px;
-            width: 90%;
-            padding: 2.5rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-            margin: 2rem auto;
-            position: relative;
-            top: 50%;
-            transform: translateY(20%);
-        }
-        
-        .form-control {
+
+        .btn-logout {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             width: 100%;
-            padding: 0.85rem 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s;
+            margin-top: 1rem;
         }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+
+        .btn-logout:hover {
+            background: linear-gradient(135deg, #ff5252, #e53935);
+            transform: translateY(-2px);
         }
-        
+
         .hidden {
             display: none !important;
         }
-        
-        /* باقي ال CSS بتاعك... */
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* الداشبورد */
+        .dashboard-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            background-color: #f5f7fb;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border-right: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding-right: 2rem;
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-right: 4px solid white;
+        }
+
+        .menu-item i {
+            margin-left: 0.75rem;
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .user-info i {
+            margin-left: 0.75rem;
+            font-size: 1.5rem;
+        }
+
+        .user-info span {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: 250px;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 1.75rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.75rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .card-header h2 {
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* رفع الصور */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 3rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            max-width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .upload-progress {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .upload-progress.active {
+            display: block;
+        }
+
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .file-info {
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--secondary);
+            width: 100%;
+        }
+
+        /* المعرض */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-image {
+            transform: scale(1.05);
+        }
+
+        .project-info {
+            padding: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .project-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        .project-actions {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        /* التنبيهات */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background-color: rgba(67, 97, 238, 0.15);
+            color: var(--secondary);
+            border: 1px solid rgba(67, 97, 238, 0.3);
+        }
+
+        .alert-danger {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #721c24;
+            border: 1px solid rgba(247, 37, 133, 0.3);
+        }
+
+        .alert-success {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #0c5460;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            padding: 1rem;
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        /* تأثيرات */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 220px;
+            }
+            .main-content {
+                margin-right: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-right: 0;
+                padding: 1rem;
+            }
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            .project-image {
+                height: 180px;
+            }
+            .login-container {
+                padding: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- حالة السيرفر -->
-    <div id="serverStatus" class="server-status disconnected">
-        <i class="fas fa-circle"></i>
-        <span>جاري الاتصال بالسيرفر...</span>
+    <!-- فيديو الخلفية -->
+    <div id="videoBackground" class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="https://michellegore.com/wp-content/uploads/2020/12/Background-Animation.mp4" type="video/mp4">
+            <!-- فيديو بديل إذا الأول مش شغال -->
+            <source src="https://michellegore.com/wp-content/uploads/2020/12/Background-Animation.mp4" type="video/mp4">
+            متصفحك لا يدعم تشغيل الفيديو.
+        </video>
+        <div class="video-overlay"></div>
     </div>
-    
+
     <!-- صفحة تسجيل الدخول -->
-    <div id="loginPage" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+    <div id="loginPage" class="container">
         <div class="login-container">
-            <div class="login-header" style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="color: var(--primary); font-size: 2.5rem;">
-                    <i class="fas fa-images"></i> نوران
-                </h1>
-                <p style="color: var(--gray); font-size: 1.2rem;">الباشمترجمة ☝️</p>
-            </div>
-            
-            <!-- إعدادات السيرفر -->
-            <div style="margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 15px;">
-                <label style="display: block; margin-bottom: 0.5rem; color: var(--secondary); font-weight: 600;">
-                    <i class="fas fa-server"></i> رابط السيرفر:
-                </label>
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="serverUrlInput" class="form-control server-input" 
-                           value="https://your-backend.vercel.app/api" 
-                           placeholder="https://your-backend.vercel.app/api">
-                    <button id="testServerBtn" class="btn" style="width: auto; background: #4cc9f0;">
-                        <i class="fas fa-plug"></i>
-                    </button>
-                </div>
-                <div id="serverMessage" style="margin-top: 0.5rem; font-size: 0.9rem;">
-                    <i class="fas fa-info-circle"></i> أدخل رابط السيرفر أولاً
-                </div>
+            <div class="login-header">
+                <h1><i class="fas fa-images"></i> معرض نوران</h1>
+                <p>لوحة تحكم الباشمترجمة نوران ☝</p>
             </div>
             
             <form id="loginForm">
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
-                        <i class="fas fa-user"></i> اسم المستخدم
-                    </label>
-                    <input type="text" id="username" class="form-control" 
-                           value="nouran sameh" placeholder="أدخل اسم المستخدم" required>
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-user"></i> اسم المستخدم</label>
+                    <input type="text" id="username" class="form-control" placeholder="أدخل اسم المستخدم" required>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
-                        <i class="fas fa-lock"></i> كلمة المرور
-                    </label>
-                    <input type="password" id="password" class="form-control" 
-                           value="22-4-2025" placeholder="أدخل كلمة المرور" required>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <input type="password" id="password" class="form-control" placeholder="أدخل كلمة المرور" required>
                 </div>
                 
-                <button type="submit" class="btn" style="width: 100%;">
+                <button type="submit" class="btn btn-block">
                     <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                 </button>
             </form>
             
-            <div id="loginError" class="hidden" style="margin-top: 1rem; padding: 1rem; background: rgba(247, 37, 133, 0.1); color: var(--danger); border-radius: 8px;">
-                <i class="fas fa-exclamation-circle"></i>
-                <span id="errorMessage"></span>
+            <div class="alert alert-danger hidden" id="loginError">
+                <i class="fas fa-exclamation-circle"></i> 
+                <span id="errorMessage">اسم المستخدم أو كلمة المرور غير صحيحة</span>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- الداشبورد -->
+    <div id="dashboardPage" class="dashboard-container hidden">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-images"></i> معرض نوران</h2>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a class="menu-item active" id="menuAdd">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>إضافة صورة جديدة</span>
+                </a>
+                <a class="menu-item" id="menuProjects">
+                    <i class="fas fa-images"></i>
+                    <span>معرض الصور</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <span id="loggedInUser">مرحباً، نوران</span>
+                        <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.2rem;">
+                            <i class="fas fa-clock"></i> <span id="loginTime"></span>
+                        </div>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </div>
+        </div>
+        
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <!-- صفحة إضافة صورة -->
+            <div id="addPage" class="page">
+                <div class="header">
+                    <h1><i class="fas fa-plus-circle"></i> إضافة صورة جديدة</h1>
+                    <div class="projects-stats">
+                        <span id="addPageStats" class="stat-item">0 صور في المعرض</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div id="localModeNotification" class="alert alert-info hidden">
+                        <i class="fas fa-info-circle"></i> 
+                        <span>الوضع المحلي: يتم العمل بدون اتصال بالخادم. سيتم حفظ الصور محلياً فقط.</span>
+                    </div>
+                    
+                    <form id="projectForm">
+                        <div class="form-group">
+                            <label for="projectTitle"><i class="fas fa-heading"></i> عنوان الصورة</label>
+                            <input type="text" id="projectTitle" class="form-control" placeholder="أدخل عنواناً للصورة" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="projectDescription"><i class="fas fa-align-left"></i> وصف الصورة</label>
+                            <textarea id="projectDescription" class="form-control" rows="3" placeholder="أدخل وصفاً للصورة" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> اختر الصورة</label>
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p style="font-size: 1.1rem; margin: 10px 0;">اسحب وأفلت الصورة هنا</p>
+                                <p style="color: var(--gray); margin-bottom: 15px;">أو انقر للاختيار من جهازك</p>
+                                <input type="file" id="imageFile" accept="image/*" class="hidden">
+                                <p style="color: var(--gray); font-size: 0.9rem;">
+                                    <i class="fas fa-check-circle"></i> يدعم: JPG, PNG, GIF, WebP (حتى 5MB)
+                                </p>
+                            </div>
+                            
+                            <div id="imagePreviewContainer" class="hidden">
+                                <div class="image-preview">
+                                    <img id="imagePreview" src="" alt="معاينة الصورة">
+                                </div>
+                                <div class="file-info" id="fileInfo">
+                                    <i class="fas fa-file-image"></i>
+                                    <span id="fileName"></span>
+                                    <span id="fileSize"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="upload-progress" id="uploadProgress">
+                                <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                            </div>
+                            
+                            <div class="upload-status" id="uploadStatus"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block" id="submitBtn">
+                            <i class="fas fa-save"></i> حفظ الصورة في المعرض
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- صفحة المعرض -->
+            <div id="projectsPage" class="page hidden">
+                <div class="header">
+                    <h1><i class="fas fa-images"></i> معرض الصور الشخصي</h1>
+                    <div class="projects-stats">
+                        <span id="projectsCount" class="stat-item">0 صور</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-photo-video"></i> جميع الصور</h2>
+                        <button id="clearAllBtn" style="display:none" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> مسح جميع الصور
+                        </button>
+                    </div>
+                    
+                    <div id="projectsList">
+                        <!-- سيتم ملؤها بـ JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- الداشبورد (مش هنكتبه هنا عشان طويل، استخدم نفس الكود بتاعك) -->
-    
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // ============== إعدادات السيرفر ==============
-        let API_BASE_URL = 'https://your-backend.vercel.app/api';
+        // ============== إعدادات API ==============
+        const API_BASE_URL = 'https://nouran-server.vercel.app/api';
         
-        // ============== بيانات الدخول ==============
+        // ============== بيانات المستخدم الافتراضية ==============
         const DEFAULT_CREDENTIALS = {
             username: 'nouran sameh',
             password: '22-4-2025'
@@ -203,159 +782,180 @@
             currentUser: null,
             token: localStorage.getItem('token') || null,
             projects: [],
+            currentImageFile: null,
             isUploading: false,
-            loginTime: localStorage.getItem('loginTime') || null
+            loginTime: null
         };
-        
+
         // ============== عناصر DOM ==============
-        const serverStatus = document.getElementById('serverStatus');
-        const serverUrlInput = document.getElementById('serverUrlInput');
-        const testServerBtn = document.getElementById('testServerBtn');
-        const serverMessage = document.getElementById('serverMessage');
         const loginPage = document.getElementById('loginPage');
+        const dashboardPage = document.getElementById('dashboardPage');
+        const videoBackground = document.getElementById('videoBackground');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
         const errorMessage = document.getElementById('errorMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loggedInUser = document.getElementById('loggedInUser');
+        const loginTime = document.getElementById('loginTime');
+        const localModeNotification = document.getElementById('localModeNotification');
         
-        // ============== التحقق من السيرفر ==============
-        async function testServerConnection(url) {
-            try {
-                serverStatus.className = 'server-status';
-                serverStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>جاري الاتصال...</span>';
-                
-                const response = await fetch(`${url}/health`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                    mode: 'cors'
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    serverStatus.className = 'server-status connected';
-                    serverStatus.innerHTML = `
-                        <i class="fas fa-check-circle"></i>
-                        <span>✅ متصل: ${url}</span>
-                    `;
-                    serverMessage.innerHTML = '<i class="fas fa-check-circle" style="color: green;"></i> متصل بالسيرفر بنجاح';
-                    serverMessage.style.color = 'green';
-                    return true;
-                } else {
-                    throw new Error('استجابة غير صحيحة');
-                }
-            } catch (error) {
-                console.error('Server connection failed:', error);
-                serverStatus.className = 'server-status disconnected';
-                serverStatus.innerHTML = `
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>❌ غير متصل</span>
-                `;
-                serverMessage.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #f72585;"></i> لا يمكن الاتصال - تأكد من الرابط';
-                serverMessage.style.color = '#f72585';
-                return false;
-            }
+        // عناصر التنقل
+        const menuAdd = document.getElementById('menuAdd');
+        const menuProjects = document.getElementById('menuProjects');
+        const addPage = document.getElementById('addPage');
+        const projectsPage = document.getElementById('projectsPage');
+        const addPageStats = document.getElementById('addPageStats');
+        
+        // عناصر الفورم
+        const projectForm = document.getElementById('projectForm');
+        const imageFile = document.getElementById('imageFile');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // عناصر المعرض
+        const projectsList = document.getElementById('projectsList');
+        const projectsCount = document.getElementById('projectsCount');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+
+        // ============== إعداد SweetAlert ==============
+        const SweetAlert = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn',
+                cancelButton: 'btn btn-danger',
+                popup: 'rtl'
+            },
+            buttonsStyling: false,
+            reverseButtons: true
+        });
+
+        // ============== دوال مساعدة ==============
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' Bytes';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(2) + ' MB';
         }
-        
-        // ============== اختبار الاتصال ==============
-        testServerBtn.addEventListener('click', async () => {
-            const url = serverUrlInput.value.trim();
-            if (!url) {
-                SweetAlert.fire('خطأ', 'الرجاء إدخال رابط السيرفر', 'error');
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('ar-EG', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('ar-EG', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // ============== إدارة رفع الملفات ==============
+        uploadArea.addEventListener('click', () => imageFile.click());
+
+        imageFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleImageFile(file);
+        });
+
+        ['dragover', 'dragenter'].forEach(event => {
+            uploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(event => {
+            uploadArea.addEventListener(event, (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (event === 'drop' && e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        handleImageFile(file);
+                    }
+                }
+            });
+        });
+
+        function handleImageFile(file) {
+            if (file.size > 5 * 1024 * 1024) {
+                SweetAlert.fire({
+                    title: '⚠️ حجم كبير جداً',
+                    text: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت',
+                    icon: 'warning'
+                });
                 return;
             }
             
-            // تحديث الرابط
-            API_BASE_URL = url;
+            state.currentImageFile = file;
             
-            // حفظ الرابط في localStorage
-            localStorage.setItem('server_url', url);
-            
-            // اختبار الاتصال
-            const isConnected = await testServerConnection(url);
-            
-            if (isConnected) {
-                SweetAlert.fire({
-                    title: '✅ اتصال ناجح',
-                    text: 'السيرفر شغال تمام!',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-            } else {
-                SweetAlert.fire({
-                    title: '❌ فشل الاتصال',
-                    html: `
-                        <p>السيرفر مش شغال أو الرابط غلط</p>
-                        <p style="color: var(--gray); font-size: 0.9rem; margin-top: 10px;">
-                            تأكد من:<br>
-                            1. السيرفر شغال على Vercel<br>
-                            2. الرابط صحيح<br>
-                            3. CORS مفعل
-                        </p>
-                    `,
-                    icon: 'error',
-                    confirmButtonText: 'حاول مرة أخرى'
-                });
-            }
-        });
-        
-        // ============== تسجيل الدخول ==============
-        async function login(username, password) {
-            // التحقق من صحة البيانات
-            if (username.toLowerCase() !== DEFAULT_CREDENTIALS.username.toLowerCase() || 
-                password !== DEFAULT_CREDENTIALS.password) {
-                throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة');
-            }
-            
-            try {
-                console.log('🔄 محاولة تسجيل الدخول على:', API_BASE_URL);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.classList.remove('hidden');
                 
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: DEFAULT_CREDENTIALS.username,
-                        password: DEFAULT_CREDENTIALS.password
-                    })
-                });
+                fileName.textContent = file.name;
+                fileSize.textContent = ` (${formatFileSize(file.size)})`;
                 
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.error || `خطأ ${response.status}`);
-                }
-                
-                if (data.success) {
-                    state.token = data.token;
-                    state.currentUser = data.user;
-                    state.loginTime = new Date().toISOString();
-                    
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('loginTime', state.loginTime);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    return true;
-                } else {
-                    throw new Error(data.error || 'فشل تسجيل الدخول');
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                throw error;
-            }
+                uploadStatus.textContent = '✅ الصورة جاهزة للرفع';
+                uploadStatus.style.color = 'green';
+            };
+            reader.readAsDataURL(file);
         }
-        
-        // ============== رفع الصورة (معدلة) ==============
+
+        // ============== دوال API ==============
         async function uploadImage(file) {
-            if (!state.token) {
-                throw new Error('مطلوب تسجيل الدخول أولاً');
-            }
-            
             const formData = new FormData();
             formData.append('image', file);
             
+            uploadProgress.classList.add('active');
+            uploadProgressBar.style.width = '10%';
+            uploadStatus.textContent = 'جاري رفع الصورة...';
+            uploadStatus.style.color = 'var(--primary)';
+            state.isUploading = true;
+            
             try {
+                const progressInterval = setInterval(() => {
+                    const currentWidth = parseInt(uploadProgressBar.style.width);
+                    if (currentWidth < 80) {
+                        uploadProgressBar.style.width = (currentWidth + 10) + '%';
+                    }
+                }, 300);
+                
+                // التحقق من التوكن قبل الإرسال
+                if (!state.token || state.token === 'local-auth-token') {
+                    // في الوضع المحلي، استخدم URL محلي للصورة
+                    clearInterval(progressInterval);
+                    uploadProgressBar.style.width = '100%';
+                    
+                    // محاكاة رفع الصورة محلياً
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    
+                    uploadStatus.textContent = '✅ تم حفظ الصورة محلياً';
+                    uploadStatus.style.color = 'green';
+                    
+                    setTimeout(() => {
+                        uploadProgress.classList.remove('active');
+                        uploadProgressBar.style.width = '0%';
+                    }, 1500);
+                    
+                    return {
+                        url: URL.createObjectURL(file),
+                        filename: file.name,
+                        local: true
+                    };
+                }
+                
                 const response = await fetch(`${API_BASE_URL}/upload`, {
                     method: 'POST',
                     headers: {
@@ -364,24 +964,74 @@
                     body: formData
                 });
                 
-                const data = await response.json();
+                clearInterval(progressInterval);
+                uploadProgressBar.style.width = '100%';
                 
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل رفع الصورة');
+                // إذا كان التوكن غير صالح أو منتهي
+                if (response.status === 401) {
+                    // أزل التوكن من localStorage وأعد التوجيه للدخول
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('loginTime');
+                    state.token = null;
+                    state.currentUser = null;
+                    
+                    SweetAlert.fire({
+                        title: 'انتهت الجلسة',
+                        text: 'انتهت صلاحية جلسة العمل. يرجى تسجيل الدخول مرة أخرى.',
+                        icon: 'warning',
+                        confirmButtonText: 'تسجيل الدخول'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    
+                    throw new Error('انتهت صلاحية التوكن. يرجى تسجيل الدخول مرة أخرى.');
                 }
                 
-                return data.data;
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `خطأ في الخادم: ${response.status}`);
+                }
                 
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'فشل في رفع الصورة');
+                }
+                
+                uploadStatus.textContent = '✅ تم رفع الصورة بنجاح';
+                uploadStatus.style.color = 'green';
+                
+                setTimeout(() => {
+                    uploadProgress.classList.remove('active');
+                    uploadProgressBar.style.width = '0%';
+                }, 1500);
+                
+                return data.data;
             } catch (error) {
-                console.error('Upload error:', error);
+                uploadStatus.textContent = '❌ فشل في رفع الصورة';
+                uploadStatus.style.color = 'var(--danger)';
+                console.error('خطأ في الرفع:', error);
                 throw error;
+            } finally {
+                state.isUploading = false;
             }
         }
-        
-        // ============== إضافة مشروع ==============
+
         async function createProject(projectData) {
-            if (!state.token) {
-                throw new Error('مطلوب تسجيل الدخول أولاً');
+            // إذا كان التوكن محلياً، احفظ المشروع محلياً
+            if (!state.token || state.token === 'local-auth-token') {
+                const newProject = {
+                    _id: 'local-' + Date.now(),
+                    title: projectData.title,
+                    description: projectData.description,
+                    imageUrl: projectData.imageUrl,
+                    uploadedAt: new Date().toISOString(),
+                    local: true
+                };
+                
+                state.projects.push(newProject);
+                localStorage.setItem('local_projects', JSON.stringify(state.projects));
+                return newProject;
             }
             
             try {
@@ -396,24 +1046,44 @@
                 
                 const data = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل حفظ المشروع');
+                if (!data.success) {
+                    throw new Error(data.error || 'فشل في حفظ الصورة');
                 }
                 
                 return data.data;
-                
             } catch (error) {
-                console.error('Create project error:', error);
+                console.error('خطأ في حفظ المشروع:', error);
                 throw error;
             }
         }
-        
-        // ============== جلب المشاريع ==============
+
         async function fetchProjects() {
+            // حاول جلب المشاريع المحلية أولاً
+            const localProjects = localStorage.getItem('local_projects');
+            if (localProjects) {
+                try {
+                    const parsedProjects = JSON.parse(localProjects);
+                    if (Array.isArray(parsedProjects)) {
+                        state.projects = parsedProjects;
+                        renderProjects();
+                        updateStats();
+                    }
+                } catch (e) {
+                    console.error('خطأ في تحليل المشاريع المحلية:', e);
+                }
+            }
+            
+            // إذا كان التوكن محلياً، لا تحاول الاتصال بالخادم
+            if (!state.token || state.token === 'local-auth-token') {
+                return;
+            }
+            
+            // حاول جلب المشاريع من الخادم
             try {
                 const response = await fetch(`${API_BASE_URL}/projects`, {
                     method: 'GET',
                     headers: {
+                        'Authorization': `Bearer ${state.token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -422,26 +1092,26 @@
                 
                 if (data.success) {
                     state.projects = data.data || [];
-                    renderProjects(); // هنكتبها بره
-                    return data.data;
+                    renderProjects();
+                    updateStats();
+                } else {
+                    throw new Error(data.error);
                 }
-                
-                return [];
-                
             } catch (error) {
-                console.error('Fetch projects error:', error);
-                state.projects = [];
-                renderProjects();
-                return [];
+                console.error('خطأ في جلب الصور من الخادم:', error);
+                // استمر في استخدام المشاريع المحلية
             }
         }
-        
-        // ============== حذف مشروع ==============
+
         async function deleteProject(projectId) {
-            if (!state.token) {
-                throw new Error('مطلوب تسجيل الدخول أولاً');
+            // إذا كان المشروع محلياً
+            if (projectId.startsWith('local-')) {
+                state.projects = state.projects.filter(p => p._id !== projectId);
+                localStorage.setItem('local_projects', JSON.stringify(state.projects));
+                return true;
             }
             
+            // إذا كان المشروع على الخادم
             try {
                 const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
                     method: 'DELETE',
@@ -453,32 +1123,574 @@
                 
                 const data = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error(data.error || 'فشل حذف الصورة');
+                if (!data.success) {
+                    throw new Error(data.error);
                 }
                 
                 return true;
-                
             } catch (error) {
-                console.error('Delete project error:', error);
+                console.error('خطأ في حذف المشروع:', error);
                 throw error;
             }
         }
-        
-        // ============== التحقق من المصادقة ==============
-        async function checkAuth() {
-            const token = localStorage.getItem('token');
-            const savedUrl = localStorage.getItem('server_url');
+
+        async function deleteAllProjects() {
+            // حذف المشاريع المحلية
+            state.projects = state.projects.filter(p => p.local !== true);
+            localStorage.setItem('local_projects', JSON.stringify(state.projects.filter(p => p.local === true)));
             
-            if (savedUrl) {
-                API_BASE_URL = savedUrl;
-                serverUrlInput.value = savedUrl;
-                await testServerConnection(API_BASE_URL);
+            // إذا كان التوكن محلياً، لا تحاول حذف من الخادم
+            if (!state.token || state.token === 'local-auth-token') {
+                return true;
             }
             
-            if (token) {
-                state.token = token;
+            // حذف المشاريع من الخادم
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('خطأ في حذف جميع المشاريع:', error);
+                throw error;
+            }
+        }
+
+        async function login(username, password) {
+            // التحقق من البيانات يدوياً أولاً
+            const normalizedUsername = username.trim().toLowerCase();
+            const normalizedDefaultUsername = DEFAULT_CREDENTIALS.username.trim().toLowerCase();
+            
+            if (normalizedUsername !== normalizedDefaultUsername || password !== DEFAULT_CREDENTIALS.password) {
+                throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة');
+            }
+            
+            // إذا البيانات صحيحة، حاول تسجيل الدخول عبر API
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        username: normalizedDefaultUsername, 
+                        password 
+                    })
+                });
+                
+                // إذا فشل الاتصال أو كان الخادم غير متوفر
+                if (!response.ok) {
+                    throw new Error('الخادم غير متوفر حالياً');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    state.token = data.token;
+                    state.currentUser = data.user;
+                    state.loginTime = new Date();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('loginTime', state.loginTime.toISOString());
+                    
+                    // أخف إشعار الوضع المحلي
+                    if (localModeNotification) {
+                        localModeNotification.classList.add('hidden');
+                    }
+                    
+                    return true;
+                } else {
+                    throw new Error(data.error || 'فشل في تسجيل الدخول');
+                }
+            } catch (error) {
+                console.warn('استخدام مصادقة محلية:', error.message);
+                // استخدم المصادقة المحلية
+                state.token = 'local-auth-token';
+                state.currentUser = { 
+                    username: 'نوران سامح', 
+                    id: 'local-user' 
+                };
+                state.loginTime = new Date();
+                localStorage.setItem('token', 'local-auth-token');
+                localStorage.setItem('loginTime', state.loginTime.toISOString());
+                
+                SweetAlert.fire({
+                    title: '⚠️ وضع غير متصل',
+                    html: `
+                        <div style="text-align: center;">
+                            <p>الخادم غير متوفر حالياً</p>
+                            <p style="color: var(--gray); font-size: 0.9rem; margin-top: 10px;">
+                                يتم استخدام الوضع المحلي. يمكنك إضافة الصور محلياً.
+                            </p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    timer: 3000
+                });
+                
+                return true;
+            }
+        }
+
+        // ============== عرض المشاريع ==============
+        function renderProjects() {
+            if (state.projects.length === 0) {
+                projectsList.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem; color: var(--gray);">
+                        <i class="fas fa-images" style="font-size: 5rem; opacity: 0.2; margin-bottom: 1.5rem;"></i>
+                        <h3 style="margin-bottom: 0.8rem; color: var(--secondary);">المعرض فارغ</h3>
+                        <p style="margin-bottom: 1.5rem; font-size: 1.1rem;">لم تقم بإضافة أي صور بعد</p>
+                        <button class="btn" onclick="switchPage('addPage')">
+                            <i class="fas fa-plus-circle"></i> أضف أول صورة
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="projects-grid">';
+            
+            state.projects.forEach(project => {
+                const uploadDate = new Date(project.uploadedAt);
+                const dateStr = formatDate(uploadDate);
+                const localBadge = project.local ? '<span style="background: #f72585; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-right: 5px;">محلي</span>' : '';
+                
+                html += `
+                    <div class="project-card">
+                        <div style="position: relative; overflow: hidden;">
+                            <img src="${project.imageUrl}" alt="${project.title}" class="project-image">
+                            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; display: flex; align-items: center;">
+                                ${localBadge}
+                                <i class="fas fa-calendar" style="margin-right: 5px;"></i> ${dateStr}
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3 class="project-title">${project.title}</h3>
+                            <p class="project-description">${project.description}</p>
+                        </div>
+                        <div class="project-actions">
+                            <button class="btn btn-danger delete-project" data-id="${project._id}">
+                                <i class="fas fa-trash-alt"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            projectsList.innerHTML = html;
+            
+            document.querySelectorAll('.delete-project').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const projectId = this.getAttribute('data-id');
+                    const project = state.projects.find(p => p._id === projectId);
+                    
+                    SweetAlert.fire({
+                        title: 'حذف الصورة',
+                        html: `
+                            <div style="text-align: center;">
+                                <i class="fas fa-trash-alt" style="font-size: 3rem; color: #f72585; margin-bottom: 1rem;"></i>
+                                <p>هل أنت متأكد من حذف الصورة؟</p>
+                                <p style="color: var(--secondary); font-weight: bold;">${project?.title}</p>
+                                ${project?.local ? '<p style="color: #f72585; font-size: 0.9rem;">(صورة محلية)</p>' : ''}
+                            </div>
+                        `,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'نعم، احذف',
+                        cancelButtonText: 'إلغاء',
+                        confirmButtonColor: '#f72585'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                await deleteProject(projectId);
+                                await fetchProjects();
+                                
+                                SweetAlert.fire({
+                                    title: 'تم الحذف',
+                                    text: 'تم حذف الصورة بنجاح',
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            } catch (error) {
+                                SweetAlert.fire({
+                                    title: 'خطأ',
+                                    text: 'فشل في حذف الصورة',
+                                    icon: 'error'
+                                });
+                            }
+                        }
+                    });
+                });
+            });
+        }
+
+        function updateStats() {
+            const count = state.projects.length;
+            projectsCount.textContent = `${count} ${count === 1 ? 'صورة' : count === 2 ? 'صورتان' : count < 11 ? 'صور' : 'صورة'}`;
+            addPageStats.textContent = `${count} ${count === 1 ? 'صورة في المعرض' : 'صور في المعرض'}`;
+        }
+
+        // ============== إدارة الفورم ==============
+        projectForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!state.currentImageFile) {
+                SweetAlert.fire({
+                    title: '⚠️ صورة ناقصة',
+                    text: 'يرجى اختيار صورة لرفعها',
+                    icon: 'warning'
+                });
+                return;
+            }
+            
+            if (state.isUploading) {
+                SweetAlert.fire({
+                    title: 'جاري الرفع',
+                    text: 'يرجى الانتظار حتى يكتمل رفع الصورة الحالية',
+                    icon: 'info'
+                });
+                return;
+            }
+            
+            const title = document.getElementById('projectTitle').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+            
+            if (!title || !description) {
+                SweetAlert.fire({
+                    title: 'حقول ناقصة',
+                    text: 'يرجى ملء جميع الحقول المطلوبة',
+                    icon: 'warning'
+                });
+                return;
+            }
+            
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            
+            try {
+                const uploadResult = await uploadImage(state.currentImageFile);
+                
+                const projectData = {
+                    title,
+                    description,
+                    imageUrl: uploadResult.url
+                };
+                
+                await createProject(projectData);
+                
+                projectForm.reset();
+                imagePreviewContainer.classList.add('hidden');
+                state.currentImageFile = null;
+                uploadStatus.textContent = '';
+                
+                SweetAlert.fire({
+                    title: '🎉 تم بنجاح!',
+                    html: `
+                        <div style="text-align: center;">
+                            <i class="fas fa-check-circle" style="font-size: 4rem; color: #4cc9f0; margin-bottom: 1rem;"></i>
+                            <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">تم إضافة الصورة إلى المعرض</p>
+                            <p style="color: var(--gray);">${title}</p>
+                            ${state.token === 'local-auth-token' ? '<p style="color: #f72585; margin-top: 10px;">(تم الحفظ محلياً)</p>' : ''}
+                        </div>
+                    `,
+                    icon: 'success',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+                
+                await fetchProjects();
+                switchPage('projectsPage');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                SweetAlert.fire({
+                    title: '❌ خطأ',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="margin-bottom: 1rem;">فشل في حفظ الصورة</p>
+                            <p style="color: var(--gray); font-size: 0.9rem;">${error.message}</p>
+                        </div>
+                    `,
+                    icon: 'error'
+                });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+
+        // ============== إدارة الصفحات ==============
+        function showLogin() {
+            loginPage.classList.remove('hidden');
+            dashboardPage.classList.add('hidden');
+            videoBackground.classList.remove('hidden');
+            loginForm.reset();
+            loginError.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            loginPage.classList.add('hidden');
+            dashboardPage.classList.remove('hidden');
+            videoBackground.classList.add('hidden');
+            
+            if (state.currentUser) {
+                loggedInUser.textContent = `مرحباً، ${state.currentUser.username}`;
+            }
+            
+            if (state.loginTime) {
+                loginTime.textContent = `سجلت دخولك الساعة ${formatTime(state.loginTime)}`;
+            }
+            
+            // أظهر أو أخف إشعار الوضع المحلي
+            if (localModeNotification) {
+                if (state.token === 'local-auth-token') {
+                    localModeNotification.classList.remove('hidden');
+                } else {
+                    localModeNotification.classList.add('hidden');
+                }
+            }
+            
+            fetchProjects();
+            switchPage('addPage');
+        }
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            if (pageId === 'addPage') {
+                menuAdd.classList.add('active');
+            } else if (pageId === 'projectsPage') {
+                menuProjects.classList.add('active');
+            }
+        }
+
+        // ============== أحداث التنقل ==============
+        menuAdd.addEventListener('click', () => switchPage('addPage'));
+        menuProjects.addEventListener('click', () => switchPage('projectsPage'));
+
+        // ============== تسجيل الدخول ==============
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
+            
+            try {
+                await login(username, password);
+                
+                showDashboard();
+                loginError.classList.add('hidden');
+                
+                SweetAlert.fire({
+                    title: 'أهلا بالبشمترجمة نوران',
+                    text: 'تم تسجيل الدخول بنجاح',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } catch (error) {
+                loginError.classList.remove('hidden');
+                errorMessage.textContent = error.message;
+                
+                // تأثير الاهتزاز
+                document.getElementById('username').classList.add('shake');
+                document.getElementById('password').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('username').classList.remove('shake');
+                    document.getElementById('password').classList.remove('shake');
+                }, 500);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // ============== تسجيل الخروج ==============
+        logoutBtn.addEventListener('click', function() {
+            SweetAlert.fire({
+                title: 'تسجيل الخروج',
+                html: `
+                    <div style="text-align: center;">
+                        <i class="fas fa-sign-out-alt" style="font-size: 4rem; color: #ff6b6b; margin-bottom: 1rem;"></i>
+                        <p>هل أنت متأكد من تسجيل الخروج؟</p>
+                        <p style="color: var(--gray); font-size: 0.9rem;">سيتم إغلاق جلسة العمل الحالية</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، سجل الخروج',
+                cancelButtonText: 'البقاء',
+                confirmButtonColor: '#ff6b6b'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('loginTime');
+                    state.currentUser = null;
+                    state.token = null;
+                    state.projects = [];
+                    state.loginTime = null;
+                    showLogin();
+                    
+                    SweetAlert.fire({
+                        title: 'تم تسجيل الخروج',
+                        text: 'تم تسجيل الخروج بنجاح، إلى اللقاء!',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        // ============== حذف الكل ==============
+        clearAllBtn.addEventListener('click', function() {
+            if (state.projects.length === 0) {
+                SweetAlert.fire({
+                    title: 'المعرض فارغ',
+                    text: 'لا توجد صور لحذفها',
+                    icon: 'info'
+                });
+                return;
+            }
+            
+            const localProjects = state.projects.filter(p => p.local === true);
+            const serverProjects = state.projects.filter(p => p.local !== true);
+            
+            let alertText = '';
+            if (localProjects.length > 0 && serverProjects.length > 0) {
+                alertText = `
+                    <div style="background: rgba(247, 37, 133, 0.1); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                        <p style="color: #f72585; font-weight: bold; margin-bottom: 0.5rem;">⚠️ سيتم حذف الصور من:</p>
+                        <p style="color: var(--gray);">• الخادم: <strong>${serverProjects.length}</strong> صورة</p>
+                        <p style="color: var(--gray);">• التخزين المحلي: <strong>${localProjects.length}</strong> صورة</p>
+                    </div>
+                `;
+            } else if (localProjects.length > 0) {
+                alertText = `
+                    <div style="background: rgba(247, 37, 133, 0.1); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                        <p style="color: #f72585; font-weight: bold; margin-bottom: 0.5rem;">⚠️ سيتم حذف الصور المحلية فقط</p>
+                    </div>
+                `;
+            }
+            
+            SweetAlert.fire({
+                title: 'مسح جميع الصور',
+                html: `
+                    <div style="text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #f72585; margin-bottom: 1rem;"></i>
+                        <p style="font-size: 1.2rem; margin-bottom: 1rem;">هل أنت متأكد من مسح <strong>جميع الصور</strong>؟</p>
+                        ${alertText}
+                        <p style="color: var(--gray); font-size: 0.9rem;">هذا الإجراء لا يمكن التراجع عنه!</p>
+                    </div>
+                `,
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، احذف الكل',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#f72585',
+                width: 500
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const loadingAlert = SweetAlert.fire({
+                        title: 'جاري الحذف...',
+                        html: `
+                            <div style="text-align: center;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                                <p>جاري حذف جميع الصور، يرجى الانتظار...</p>
+                            </div>
+                        `,
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+                    
+                    try {
+                        await deleteAllProjects();
+                        state.projects = [];
+                        renderProjects();
+                        
+                        await loadingAlert.close();
+                        
+                        SweetAlert.fire({
+                            title: '✅ تم المسح',
+                            html: `
+                                <div style="text-align: center;">
+                                    <i class="fas fa-check-circle" style="font-size: 4rem; color: green; margin-bottom: 1rem;"></i>
+                                    <p>تم حذف جميع الصور بنجاح</p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } catch (error) {
+                        await loadingAlert.close();
+                        
+                        SweetAlert.fire({
+                            title: '❌ خطأ',
+                            text: 'فشل في حذف جميع الصور',
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
+        });
+
+        // ============== التحقق من حالة المصادقة ==============
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            const savedLoginTime = localStorage.getItem('loginTime');
+            
+            if (token && savedLoginTime) {
+                const loginTime = new Date(savedLoginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                // إذا مرت أكثر من 24 ساعة، سجل الخروج تلقائياً
+                if (hoursDiff > 24) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('loginTime');
+                    showLogin();
+                    return;
+                }
+                
+                state.token = token;
+                state.loginTime = loginTime;
+                
+                // إذا كان التوكن محلياً، استخدم الوضع المحلي
+                if (token === 'local-auth-token') {
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
+                    showDashboard();
+                    return;
+                }
+                
+                // حاول التحقق من التوكن مع الخادم
                 try {
                     const response = await fetch(`${API_BASE_URL}/auth/me`, {
                         method: 'GET',
@@ -492,83 +1704,36 @@
                         const data = await response.json();
                         if (data.success) {
                             state.currentUser = data.user;
-                            // هنا هتظهر الداشبورد
-                            console.log('✅ مستخدم مسجل:', data.user);
+                            showDashboard();
                             return;
                         }
                     }
                     
-                    // لو التوكن غلط
-                    localStorage.removeItem('token');
-                    state.token = null;
+                    // إذا فشل التحقق، انتقل للوضع المحلي
+                    console.log('فشل التحقق من التوكن، استخدام الوضع المحلي');
+                    state.token = 'local-auth-token';
+                    localStorage.setItem('token', 'local-auth-token');
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
+                    showDashboard();
                     
                 } catch (error) {
-                    console.error('Auth check failed:', error);
+                    console.log('فشل الاتصال بالخادم، استخدام الوضع المحلي:', error.message);
+                    state.token = 'local-auth-token';
+                    localStorage.setItem('token', 'local-auth-token');
+                    state.currentUser = { username: 'نوران سامح', id: 'local-user' };
+                    showDashboard();
                 }
-            }
-        }
-        
-        // ============== معالجة تسجيل الدخول ==============
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const submitBtn = loginForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            
-            // اختبار السيرفر أولاً
-            if (!await testServerConnection(API_BASE_URL)) {
-                SweetAlert.fire({
-                    title: '⚠️ السيرفر غير متصل',
-                    text: 'تأكد من تشغيل السيرفر ثم جرب مرة أخرى',
-                    icon: 'warning'
-                });
                 return;
             }
             
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
-            
-            try {
-                await login(username, password);
-                
-                SweetAlert.fire({
-                    title: '🎉 أهلاً نوران!',
-                    text: 'تم تسجيل الدخول بنجاح',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    // هنا هتوجه للداشبورد
-                    window.location.href = '/dashboard'; // أو اعرض الداشبورد
-                });
-                
-            } catch (error) {
-                loginError.classList.remove('hidden');
-                errorMessage.textContent = error.message;
-                
-                SweetAlert.fire({
-                    title: '❌ خطأ',
-                    text: error.message,
-                    icon: 'error'
-                });
-                
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-            }
-        });
-        
+            showLogin();
+        }
+
         // ============== بدء التطبيق ==============
-        document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuth();
-            
-            // اختبار الاتصال التلقائي
-            if (serverUrlInput.value) {
-                await testServerConnection(serverUrlInput.value);
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
         });
     </script>
 </body>
 </html>
+
